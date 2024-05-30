@@ -20,6 +20,7 @@
         <maven.checkstyle.plugin.configLocation>checkstyle.xml</maven.checkstyle.plugin.configLocation>
         <jjwt.version>0.12.5</jjwt.version>
         <telegrambot.version>6.9.7.1</telegrambot.version>
+        <jjwt.version>0.12.5</jjwt.version>
     </properties>
     <dependencies>
         <dependency>
@@ -60,6 +61,7 @@
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
+            <version>${liquibase.version}</version>
         </dependency>
         <dependency>
             <groupId>org.liquibase</groupId>
@@ -136,6 +138,22 @@
             <groupId>com.stripe</groupId>
             <artifactId>stripe-java</artifactId>
             <version>25.9.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
