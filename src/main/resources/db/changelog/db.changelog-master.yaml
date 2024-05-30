@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/changes/create-users-roles-table.yaml
   - include:
       file: db/changelog/changes/add-rentals-table.yaml
+  - include:
+      file: db/changelog/changes/add-payments-table.yml

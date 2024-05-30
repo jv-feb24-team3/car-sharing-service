@@ -5,9 +5,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import lombok.Getter;
@@ -27,7 +29,8 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     @Basic(optional = false)
     private Type type;
-    // Rental id one to one
+    @OneToOne(fetch = FetchType.EAGER)
+    private Rental rental;
     @Column(nullable = false)
     private String sessionUrl;
     @Column(nullable = false, unique = true)

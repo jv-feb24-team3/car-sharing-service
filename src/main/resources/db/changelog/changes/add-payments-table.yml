@@ -23,6 +23,13 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: rental_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_payments_rentals
+                    references: rentals(id)
+                    primaryKey: true
+              - column:
                    name: session_url
                    type: varchar(255)
                    constraints:
