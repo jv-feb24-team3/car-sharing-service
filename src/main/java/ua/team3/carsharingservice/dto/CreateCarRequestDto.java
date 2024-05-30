@@ -9,5 +9,5 @@ public class CreateCarRequestDto {
     private String brand;
     private Car.CarType type;
     private int inventory;
-    private BigDecimal dailyFree;
+    private BigDecimal dailyFee;
 }

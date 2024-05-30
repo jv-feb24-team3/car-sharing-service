@@ -9,5 +9,5 @@ public class CarDto {
     private String brand;
     private String type;
     private int inventory;
-    private BigDecimal dailyFree;
+    private BigDecimal dailyFee;
 }
