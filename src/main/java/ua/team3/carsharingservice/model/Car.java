@@ -1,6 +1,5 @@
 package ua.team3.carsharingservice.model;
 
-import java.math.BigDecimal;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -28,7 +28,7 @@ public class Car {
     private String brand;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private String type;
+    private CarType type;
     @Column(nullable = false)
     private int inventory;
     @Column(name = "daily_free", nullable = false)
