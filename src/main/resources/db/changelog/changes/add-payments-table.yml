@@ -14,12 +14,12 @@ databaseChangeLog:
                     primaryKey: true
               - column:
                   name: status
-                  type: enum('PENDING', 'PAID')
+                  type: enum('PENDING', 'PAID', 'EXPIRED')
                   constraints:
                     nullable: false
               - column:
                   name: type
-                  type: enum('PAYMENT', 'FINE', 'EXPIRED')
+                  type: enum('PAYMENT', 'FINE')
                   constraints:
                     nullable: false
               - column:
