@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-payments-table
+      author: o.farion
+      changes:
+        - createTable:
+            tableName: payments
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: status
+                  type: enum('PENDING', 'PAID')
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: enum('PAYMENT', 'FINE', 'EXPIRED')
+                  constraints:
+                    nullable: false
+              - column:
+                   name: session_url
+                   type: varchar(255)
+                   constraints:
+                     nullable: false
+              - column:
+                  name: session_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: amount
+                  type: decimal(38,2)
+                  constraints:
+                    nullable: false
