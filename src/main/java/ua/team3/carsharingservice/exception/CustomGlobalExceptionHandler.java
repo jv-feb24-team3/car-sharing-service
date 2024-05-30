@@ -24,7 +24,6 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     private static final String TIMESTAMP = "timestamp";
     private static final String STATUS = "status";
     private static final String ERRORS = "errors";
-    private final Map<String, Object> body = new LinkedHashMap<>();
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
@@ -32,11 +31,12 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
             HttpHeaders headers,
             HttpStatusCode status,
             WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
         body.put(TIMESTAMP, LocalDateTime.now());
         body.put(STATUS, HttpStatus.BAD_REQUEST);
         List<String> errors = ex.getBindingResult().getAllErrors()
                 .stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .map(this::getErrorMessage)
                 .toList();
         body.put(ERRORS, errors);
         return new ResponseEntity<>(body, headers, status);
@@ -54,6 +54,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     }
 
     private ResponseEntity<Object> getDefaultTemplate(Throwable e, HttpStatus status) {
+        Map<String, Object> body = new LinkedHashMap<>();
         body.put(TIMESTAMP, LocalDateTime.now());
         body.put(STATUS, status);
         body.put(ERRORS, e.getMessage());
