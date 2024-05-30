@@ -21,6 +21,7 @@
         <webmvc-ui.version>2.5.0</webmvc-ui.version>
         <testcontainers.version>1.19.7</testcontainers.version>
         <maven.checkstyle.plugin.configLocation>checkstyle.xml</maven.checkstyle.plugin.configLocation>
+        <telegrambot.version>6.9.7.1</telegrambot.version>
     </properties>
     <dependencies>
         <dependency>
@@ -112,6 +113,11 @@
             <artifactId>mysql</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots</artifactId>
+            <version>${telegrambot.version}</version>
         </dependency>
         <dependency>
             <groupId>com.stripe</groupId>
