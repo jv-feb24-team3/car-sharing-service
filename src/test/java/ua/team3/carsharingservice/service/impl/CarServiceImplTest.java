@@ -131,8 +131,8 @@ class CarServiceImplTest {
         when(carMapper.toDto(firstCar)).thenReturn(firstCarDto);
         when(carMapper.toDto(secondCar)).thenReturn(secondCarDto);
 
-        CarDto firstResult = carService.findCartById(firstCar.getId());
-        CarDto secondResult = carService.findCartById(secondCar.getId());
+        CarDto firstResult = carService.findCarById(firstCar.getId());
+        CarDto secondResult = carService.findCarById(secondCar.getId());
 
         assertEquals(firstCar.getId(), firstResult.getId());
         assertEquals(firstCar.getBrand(), firstResult.getBrand());
@@ -147,7 +147,7 @@ class CarServiceImplTest {
         when(carRepository.findById(CAR_ID)).thenReturn(Optional.empty());
 
         EntityNotFoundException thrown = assertThrows(EntityNotFoundException.class, () -> {
-            carService.findCartById(CAR_ID);
+            carService.findCarById(CAR_ID);
         });
 
         assertEquals("Can't find car with id: " + CAR_ID, thrown.getMessage());

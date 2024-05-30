@@ -10,7 +10,7 @@ public interface CarService {
 
     List<CarDto> findAllCars(Pageable pageable);
 
-    CarDto findCartById(Long id);
+    CarDto findCarById(Long id);
 
     CarDto updateById(Long id, CreateCarRequestDto requestDto);
 

@@ -32,7 +32,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public CarDto findCartById(Long id) {
+    public CarDto findCarById(Long id) {
         return carRepository.findById(id)
                 .map(carMapper::toDto)
                 .orElseThrow(() -> new EntityNotFoundException("Can't find car with id: " + id));
