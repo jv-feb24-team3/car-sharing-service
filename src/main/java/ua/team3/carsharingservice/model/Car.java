@@ -31,7 +31,7 @@ public class Car {
     private String type;
     @Column(nullable = false)
     private int inventory;
-    @Column(nullable = false)
+    @Column(name = "daily_free", nullable = false)
     private BigDecimal dailyFree;
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
