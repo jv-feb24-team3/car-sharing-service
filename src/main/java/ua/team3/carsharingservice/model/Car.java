@@ -31,8 +31,8 @@ public class Car {
     private CarType type;
     @Column(nullable = false)
     private int inventory;
-    @Column(name = "daily_free", nullable = false)
-    private BigDecimal dailyFree;
+    @Column(name = "daily_fee", nullable = false)
+    private BigDecimal dailyFee;
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 
