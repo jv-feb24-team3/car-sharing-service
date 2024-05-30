@@ -12,7 +12,10 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Value("${bot.token}")
     private final String botToken;
 
-    public TelegramBot( @Value("${bot.token}") String botToken, @Value("${bot.name}") String botName) {
+    public TelegramBot(
+            @Value("${bot.token}") String botToken,
+            @Value("${bot.name}") String botName
+    ) {
         super(botToken);
         this.botName = botName;
         this.botToken = botToken;
