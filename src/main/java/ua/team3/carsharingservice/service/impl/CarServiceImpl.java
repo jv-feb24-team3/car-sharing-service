@@ -1,7 +1,7 @@
 package ua.team3.carsharingservice.service.impl;
 
-import java.util.List;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -45,7 +45,7 @@ public class CarServiceImpl implements CarService {
         car.setBrand(requestDto.getBrand());
         car.setType(requestDto.getType());
         car.setInventory(requestDto.getInventory());
-        car.setDailyFee(requestDto.getDailyFree());
+        car.setDailyFee(requestDto.getDailyFee());
         return carMapper.toDto(carRepository.save(car));
     }
 
