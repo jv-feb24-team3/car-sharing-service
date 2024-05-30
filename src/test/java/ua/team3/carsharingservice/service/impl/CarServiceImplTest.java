@@ -1,15 +1,16 @@
 package ua.team3.carsharingservice.service.impl;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -124,7 +125,6 @@ class CarServiceImplTest {
         CarDto secondCarDto = new CarDto();
         secondCarDto.setId(SECOND_CAR_ID);
         secondCarDto.setBrand(TESLA_BRAND);
-
 
         when(carRepository.findById(firstCar.getId())).thenReturn(Optional.of(firstCar));
         when(carRepository.findById(secondCar.getId())).thenReturn(Optional.of(secondCar));
