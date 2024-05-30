@@ -45,7 +45,7 @@ public class CarServiceImpl implements CarService {
         car.setBrand(requestDto.getBrand());
         car.setType(requestDto.getType());
         car.setInventory(requestDto.getInventory());
-        car.setDailyFree(requestDto.getDailyFree());
+        car.setDailyFee(requestDto.getDailyFree());
         return carMapper.toDto(carRepository.save(car));
     }
 
