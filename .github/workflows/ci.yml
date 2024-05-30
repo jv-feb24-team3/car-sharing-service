@@ -18,3 +18,4 @@ jobs:
         run: mvn --batch-mode --update-snapshots verify
 env:
   TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}

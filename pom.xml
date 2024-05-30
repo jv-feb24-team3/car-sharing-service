@@ -115,6 +115,11 @@
             <artifactId>telegrambots</artifactId>
             <version>${telegrambot.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>25.9.0</version>
+        </dependency>
     </dependencies>
 
     <build>

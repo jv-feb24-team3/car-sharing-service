@@ -28,7 +28,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: daily_free
+                  name: daily_fee
                   type: decimal(10,2)
                   constraints:
                     nullable: false
