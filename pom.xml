@@ -20,7 +20,6 @@
         <maven.checkstyle.plugin.configLocation>checkstyle.xml</maven.checkstyle.plugin.configLocation>
         <jjwt.version>0.12.5</jjwt.version>
         <telegrambot.version>6.9.7.1</telegrambot.version>
-        <jjwt.version>0.12.5</jjwt.version>
     </properties>
     <dependencies>
         <dependency>
