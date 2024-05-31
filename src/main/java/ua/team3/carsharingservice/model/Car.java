@@ -36,7 +36,7 @@ public class Car {
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 
-    private enum CarType {
+    public enum CarType {
         SEDAN,
         SUV,
         HATCHBACK,
