@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ua.team3.carsharingservice.dto.payment.PaymentResponseDto;
+import ua.team3.carsharingservice.dto.payment.PaymentResultResponseDto;
 import ua.team3.carsharingservice.model.Payment;
 import ua.team3.carsharingservice.service.PaymentService;
 
@@ -34,25 +35,25 @@ public class PaymentController {
 
     @PostMapping("/{rentalId}")
     @Operation(summary = "create payment session",
-            description = "s")
+            description = "Endpoint for creation of payment session")
     public void createPaymentSession(@PathVariable Long rentalId,
                                      HttpServletResponse response) {
         PaymentResponseDto responseDto = paymentService.createPaymentSession(rentalId);
-        response.setHeader(HttpHeaders.LOCATION, responseDto.getSessionUrl());
+        response.setHeader(HttpHeaders.LOCATION, responseDto.sessionUrl());
     }
 
     @GetMapping("/success")
     @Operation(summary = "Payment success",
-            description = "s")
-    public String paymentSuccess() {
-        return "Payment was successful!";
+            description = "Endpoint for successes payment")
+    public PaymentResultResponseDto paymentSuccess() {
+        return new PaymentResultResponseDto("Payment was successful!");
     }
 
     @GetMapping("/cancel")
     @Operation(summary = "Payment cancel",
-            description = "s")
-    public String paymentCancel() {
-        return "Payment was canceled!";
+            description = "Endpoint for canceled payment")
+    public PaymentResultResponseDto paymentCancel() {
+        return new PaymentResultResponseDto("Payment was canceled!");
     }
 
 }

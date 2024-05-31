@@ -13,21 +13,21 @@ import ua.team3.carsharingservice.service.PaymentSystemService;
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
-    private static final String SUCCESS_URL = "http://localhost:8080/payments/success";
-    private static final String CANCEL_URL = "http://localhost:8080/payments/cancel";
+    private static final BigDecimal CONVERSION_RATE = BigDecimal.valueOf(100);
+    private static final String SUCCESS_URL = "http://localhost:8080/api/payments/success";
+    private static final String CANCEL_URL = "http://localhost:8080/api/payments/cancel";
     private final PaymentRepository paymentRepository;
     private final PaymentSystemService paymentSystemService;
 
     @Override
     public PaymentResponseDto createPaymentSession(Long rentalId) {
-        //get rental from db
         BigDecimal amount = new BigDecimal(125);
-        String sessionId = paymentSystemService.createPaymentSession(amount, SUCCESS_URL,
+        BigDecimal amountToPay = amount.multiply(CONVERSION_RATE);
+        String productName = "Audi A8";
+        String sessionId = paymentSystemService.createPaymentSession(productName, amountToPay, SUCCESS_URL,
                 CANCEL_URL).getId();
         String sessionUrl = paymentSystemService.getSessionUrl(sessionId);
-        PaymentResponseDto responseDto = new PaymentResponseDto();
-        responseDto.setSessionUrl(sessionUrl);
-        return responseDto;
+        return new PaymentResponseDto(sessionUrl);
     }
 
     @Override

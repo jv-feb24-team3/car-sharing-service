@@ -18,13 +18,12 @@ import ua.team3.carsharingservice.service.PaymentSystemService;
 @Service
 @RequiredArgsConstructor
 public class StripeService implements PaymentSystemService {
-    private static final String PRODUCT_NAME = "Car Rental Payment";
     private static final Long DEFAULT_QUANTITY = 1L;
     private static final String CURRENCY = "USD";
 
-    public Session createPaymentSession(BigDecimal amount, String successUrl,
+    public Session createPaymentSession(String productName, BigDecimal amount, String successUrl,
                                         String cancelUrl) {
-        SessionCreateParams params = buildSessionParams(amount, successUrl, cancelUrl);
+        SessionCreateParams params = buildSessionParams(productName, amount, successUrl, cancelUrl);
 
         try {
             return Session.create(params);
@@ -44,7 +43,8 @@ public class StripeService implements PaymentSystemService {
         return session.getUrl();
     }
 
-    private SessionCreateParams buildSessionParams(BigDecimal amount,
+    private SessionCreateParams buildSessionParams(String productName,
+                                                   BigDecimal amount,
                                                    String successUrl,
                                                    String cancelUrl) {
         return SessionCreateParams.builder()
@@ -52,25 +52,25 @@ public class StripeService implements PaymentSystemService {
                 .setMode(Mode.PAYMENT)
                 .setSuccessUrl(successUrl)
                 .setCancelUrl(cancelUrl)
-                .addLineItem(buildLineItem(amount)).build();
+                .addLineItem(buildLineItem(productName, amount)).build();
     }
 
-    private LineItem buildLineItem(BigDecimal amount) {
+    private LineItem buildLineItem(String productName, BigDecimal amount) {
         return LineItem.builder()
                 .setQuantity(DEFAULT_QUANTITY)
-                .setPriceData(buildPriceData(amount)).build();
+                .setPriceData(buildPriceData(productName, amount)).build();
     }
 
-    private PriceData buildPriceData(BigDecimal amount) {
+    private PriceData buildPriceData(String productName, BigDecimal amount) {
         return PriceData.builder()
                 .setCurrency(CURRENCY)
                 .setUnitAmount(amount.longValue())
-                .setProductData(buildProductData()).build();
+                .setProductData(buildProductData(productName)).build();
     }
 
-    private ProductData buildProductData() {
+    private ProductData buildProductData(String productName) {
         return ProductData.builder()
-                .setName(PRODUCT_NAME)
+                .setName(productName)
                 .build();
     }
 }
