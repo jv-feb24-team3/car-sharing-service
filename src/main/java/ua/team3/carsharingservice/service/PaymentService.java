@@ -1,11 +1,10 @@
 package ua.team3.carsharingservice.service;
 
-
-import com.stripe.model.checkout.Session;
-import java.util.Map;
+import ua.team3.carsharingservice.dto.payment.PaymentResponseDto;
+import ua.team3.carsharingservice.model.Payment;
 
 public interface PaymentService {
-    Session createPaymentSession(long amount, String currency, String successUrl, String cancelUrl);
+    PaymentResponseDto createPaymentSession(Long rentalId);
 
-    Map<String, Object> getPaymentDetails(String userId);
+    Payment getPaymentById(Long id);
 }
