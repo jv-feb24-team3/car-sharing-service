@@ -33,7 +33,7 @@ public class JwtUtil {
     }
 
     public boolean isValidToken(String token) {
-        try{
+        try {
             Jws<Claims> claimsJws = Jwts.parser()
                     .verifyWith(secret)
                     .build()
