@@ -1,9 +1,10 @@
 package ua.team3.carsharingservice.controller;
 
-import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,13 @@ import ua.team3.carsharingservice.service.CarService;
 public class CarController {
     private final CarService carService;
 
-    @Operation(summary = "Create new car", description = "Add new car to table")
+    @Operation(
+            summary = "Create new car",
+            description = "Add new car to database. Only accessible by user with the ADMIN role.",
+            parameters =
+            @Parameter(name = "requestDto",
+                    description = "Dto containing details for creating car")
+    )
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
@@ -36,16 +43,40 @@ public class CarController {
         return carService.addCar(requestDto);
     }
 
+    @Operation(
+            summary = "Return list of cars",
+            description = "Returns a paginated list of cars for every user",
+            parameters =
+            @Parameter(name = "pageable",
+            description = "Pagination information (page number and size")
+    )
     @GetMapping
     public List<CarDto> getAllCars(Pageable pageable) {
         return carService.findAllCars(pageable);
     }
 
+    @Operation(
+            summary = "Return car by id",
+            description = "Return details of car by its id",
+            parameters =
+            @Parameter(name = "cartId",
+                    description = "Id of the car to be retrieved")
+    )
     @GetMapping("/{carId}")
     public CarDto getCarById(@PathVariable Long carId) {
         return carService.findCarById(carId);
     }
 
+    @Operation(
+            summary = "Update car by id",
+            description = "Update data about a car by its id. "
+                    + "Only accessible by users with the ADMIN role.",
+            parameters = {
+                    @Parameter(name = "carId",
+                            description = "ID of the car to be updated", required = true),
+                    @Parameter(name = "requestDto",
+                            description = "DTO containing updated car details", required = true)
+            })
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{carId}")
     public CarDto updateCarById(@PathVariable Long carId,
@@ -53,6 +84,12 @@ public class CarController {
         return carService.updateById(carId, requestDto);
     }
 
+    @Operation(
+            summary = "Delete by id",
+            description = "Delete data about a car by its id. Only accessible by user role ADMIN",
+            parameters =
+            @Parameter(name = "carId",
+                    description = "Id of the car to be deleted", required = true))
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{cardId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
