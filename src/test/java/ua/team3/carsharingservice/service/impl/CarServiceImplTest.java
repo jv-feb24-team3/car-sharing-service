@@ -3,11 +3,9 @@ package ua.team3.carsharingservice.service.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +18,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 import ua.team3.carsharingservice.dto.CarDto;
 import ua.team3.carsharingservice.dto.CreateCarRequestDto;
+import ua.team3.carsharingservice.exception.EntityNotFoundException;
 import ua.team3.carsharingservice.mapper.CarMapper;
 import ua.team3.carsharingservice.model.Car;
 import ua.team3.carsharingservice.repository.CarRepository;
@@ -34,6 +34,10 @@ class CarServiceImplTest {
     private static final String TESLA_BRAND = "Tesla";
     private static final Long SECOND_CAR_ID = 2L;
     private static final String UPDATED_CAR_BRAND = "Audi";
+    private static final int PAGE_SIZE = 1;
+    private static final String EXCEPTED_CAR_TYPE_SEDAN = "SEDAN";
+    private static final int EXPECTED_INVENTORY = 10;
+
     @Mock
     private CarRepository carRepository;
     @Mock
@@ -46,7 +50,7 @@ class CarServiceImplTest {
     void addNewCar_validData_success() {
         CreateCarRequestDto carRequestDto = new CreateCarRequestDto();
         carRequestDto.setDailyFee(BigDecimal.valueOf(100));
-        carRequestDto.setType(Car.CarType.SEDAN);
+        carRequestDto.setType(String.valueOf(Car.CarType.SEDAN));
         carRequestDto.setBrand(BMW_BRAND);
         carRequestDto.setInventory(10);
 
@@ -62,12 +66,16 @@ class CarServiceImplTest {
         when(carRepository.save(car)).thenReturn(car);
         when(carMapper.toDto(car)).thenReturn(carDto);
 
+        Car expectedCar = new Car();
+        expectedCar.setId(CAR_ID);
+        expectedCar.setBrand(BMW_BRAND);
+        expectedCar.setType(Car.CarType.valueOf(EXCEPTED_CAR_TYPE_SEDAN));
+        expectedCar.setInventory(EXPECTED_INVENTORY);
+
         CarDto createdCar = carService.addCar(carRequestDto);
 
         assertNotNull(createdCar);
-        assertEquals(BMW_BRAND, createdCar.getBrand());
-        assertEquals(10, createdCar.getInventory());
-        assertEquals(Car.CarType.SEDAN, createdCar.getType());
+        EqualsBuilder.reflectionEquals(expectedCar, createdCar);
     }
 
     @Test
@@ -89,24 +97,24 @@ class CarServiceImplTest {
         secondCarDto.setId(SECOND_CAR_ID);
         secondCarDto.setBrand(TESLA_BRAND);
 
-        List<Car> cars = List.of(firstCar, secondCar);
-        Page<Car> carPage = new PageImpl<>(cars);
-        Pageable pageable = Pageable.ofSize(1);
+        List<Car> expected = List.of(firstCar, secondCar);
+        Page<Car> carPage = new PageImpl<>(expected);
+        Pageable pageable = Pageable.ofSize(PAGE_SIZE);
 
         when(carRepository.findAll(pageable)).thenReturn(carPage);
         when(carMapper.toDto(firstCar)).thenReturn(firstCarDto);
         when(carMapper.toDto(secondCar)).thenReturn(secondCarDto);
-        
+
         List<CarDto> result = carService.findAllCars(pageable);
-        
+
         assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals(CAR_ID, result.get(0).getId());
-        assertEquals(BMW_BRAND, result.get(0).getBrand());
-        assertEquals(SECOND_CAR_ID, result.get(1).getId());
-        assertEquals(TESLA_BRAND, result.get(1).getBrand());
+        for (int i = 0; i < expected.size(); i++) {
+            Car expectedCar = expected.get(i);
+            CarDto resultCarDto = result.get(i);
+            EqualsBuilder.reflectionEquals(expectedCar, resultCarDto, "id");
+        }
     }
-    
+
     @Test
     @DisplayName("Return car by id")
     void findById_validData_success() {
@@ -134,11 +142,7 @@ class CarServiceImplTest {
         CarDto firstResult = carService.findCarById(firstCar.getId());
         CarDto secondResult = carService.findCarById(secondCar.getId());
 
-        assertEquals(firstCar.getId(), firstResult.getId());
-        assertEquals(firstCar.getBrand(), firstResult.getBrand());
-        assertEquals(secondCarDto, secondResult);
-        assertEquals(secondCar.getId(), secondResult.getId());
-        assertEquals(secondCar.getBrand(), secondResult.getBrand());
+        EqualsBuilder.reflectionEquals(firstResult, secondResult, "id");
     }
 
     @Test
@@ -157,6 +161,9 @@ class CarServiceImplTest {
     @DisplayName("Update car by id")
     void updateCarById_validData_success() {
         CreateCarRequestDto carRequestDto = new CreateCarRequestDto();
+        carRequestDto.setType(String.valueOf(Car.CarType.SEDAN));
+        carRequestDto.setInventory(10);
+        carRequestDto.setDailyFee(BigDecimal.valueOf(100));
         carRequestDto.setBrand(UPDATED_CAR_BRAND);
 
         CarDto carDto = new CarDto();
@@ -202,7 +209,7 @@ class CarServiceImplTest {
 
         carService.deleteById(CAR_ID);
 
-        verify(carRepository, times(1)).delete(car);
+        verify(carRepository).delete(car);
     }
 
     @Test
