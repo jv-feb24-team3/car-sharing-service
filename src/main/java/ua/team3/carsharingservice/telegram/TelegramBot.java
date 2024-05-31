@@ -1,15 +1,24 @@
 package ua.team3.carsharingservice.telegram;
 
 import lombok.SneakyThrows;
-import org.telegram.telegrambots.bots.DefaultBotOptions;
+import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 public class TelegramBot extends TelegramLongPollingBot {
+    @Value("${bot.name}")
+    private final String botName;
+    @Value("${bot.token}")
+    private final String botToken;
 
-    public TelegramBot(DefaultBotOptions options, String botToken) {
-        super(options, botToken);
+    public TelegramBot(
+            @Value("${bot.token}") String botToken,
+            @Value("${bot.name}") String botName
+    ) {
+        super(botToken);
+        this.botName = botName;
+        this.botToken = botToken;
     }
 
     @Override
@@ -25,6 +34,6 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "Car Sharing Service";
+        return botName;
     }
 }
