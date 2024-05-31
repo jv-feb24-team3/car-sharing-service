@@ -1,12 +1,12 @@
 package ua.team3.carsharingservice.service.impl;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.team3.carsharingservice.dto.CarDto;
 import ua.team3.carsharingservice.dto.CreateCarRequestDto;
+import ua.team3.carsharingservice.exception.EntityNotFoundException;
 import ua.team3.carsharingservice.mapper.CarMapper;
 import ua.team3.carsharingservice.model.Car;
 import ua.team3.carsharingservice.repository.CarRepository;
@@ -43,7 +43,7 @@ public class CarServiceImpl implements CarService {
         Car car = carRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Can't find car with id: " + id));
         car.setBrand(requestDto.getBrand());
-        car.setType(requestDto.getType());
+        car.setType(Car.CarType.valueOf(requestDto.getType()));
         car.setInventory(requestDto.getInventory());
         car.setDailyFee(requestDto.getDailyFee());
         return carMapper.toDto(carRepository.save(car));
