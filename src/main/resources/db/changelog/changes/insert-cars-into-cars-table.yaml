@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-cars-into-cars-table
+      author: Hadiuchko.Dmytro
+      changes:
+        - loadData:
+            tableName: cars
+            file: data/cars.csv
+            separator: ','
