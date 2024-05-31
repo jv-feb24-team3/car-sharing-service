@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 import ua.team3.carsharingservice.dto.CarDto;
 import ua.team3.carsharingservice.dto.CreateCarRequestDto;
-import ua.team3.carsharingservice.exception.EntityNotFoundException;
 import ua.team3.carsharingservice.mapper.CarMapper;
 import ua.team3.carsharingservice.model.Car;
 import ua.team3.carsharingservice.repository.CarRepository;
@@ -109,9 +109,7 @@ class CarServiceImplTest {
 
         assertNotNull(result);
         for (int i = 0; i < expected.size(); i++) {
-            Car expectedCar = expected.get(i);
-            CarDto resultCarDto = result.get(i);
-            EqualsBuilder.reflectionEquals(expectedCar, resultCarDto, "id");
+            EqualsBuilder.reflectionEquals(expected.get(i), result.get(i), "id");
         }
     }
 
