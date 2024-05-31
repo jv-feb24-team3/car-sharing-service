@@ -22,7 +22,7 @@ import ua.team3.carsharingservice.security.JwtAuthenticationFilter;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
@@ -30,6 +30,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .cors(AbstractHttpConfigurer::disable)
