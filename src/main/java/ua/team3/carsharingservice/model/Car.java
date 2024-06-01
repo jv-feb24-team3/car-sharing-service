@@ -36,8 +36,7 @@ public class Car {
     private int inventory;
     @Column(name = "daily_fee", nullable = false)
     private BigDecimal dailyFee;
-    @Column(name = "is_deleted", nullable = false)
-    @JdbcTypeCode(BIT)
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "TINYINT(1)")
     private boolean isDeleted;
 
     public enum CarType {
