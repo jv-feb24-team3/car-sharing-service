@@ -10,6 +10,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/add-rentals-table.yaml
   - include:
-      file: db/changelog/changes/add-payments-table.yml
+      file: db/changelog/changes/create-payments-table.yml
   - include:
       file: db/changelog/changes/insert-cars-into-cars-table.yaml
