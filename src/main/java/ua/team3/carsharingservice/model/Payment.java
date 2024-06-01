@@ -46,6 +46,6 @@ public class Payment {
 
     public enum Type {
         PAYMENT,
-        FINE,
+        FINE
     }
 }

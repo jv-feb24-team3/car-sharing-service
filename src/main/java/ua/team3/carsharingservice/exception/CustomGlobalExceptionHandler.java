@@ -61,7 +61,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler({
             NotValidRentalDateException.class,
-            NotValidReturnDateException.class
+            NotValidReturnDateException.class,
+            PaymentProcessedException.class
     })
     public ResponseEntity<Object> handleBadRequestException(
             Exception e) {

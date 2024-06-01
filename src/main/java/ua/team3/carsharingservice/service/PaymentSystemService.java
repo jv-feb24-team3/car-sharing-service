@@ -7,5 +7,5 @@ import java.math.BigDecimal;
 public interface PaymentSystemService {
     Session createPaymentSession(String productName, BigDecimal amount, String successUrl, String cancelUrl);
 
-    String getSessionUrl(String sessionId);
+    Session getSession(String sessionId);
 }
