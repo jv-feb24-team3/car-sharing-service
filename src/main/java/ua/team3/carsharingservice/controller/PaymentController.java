@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ua.team3.carsharingservice.dto.stripe.payment.PaymentResponseDto;
+import ua.team3.carsharingservice.dto.stripe.payment.PaymentDto;
+import ua.team3.carsharingservice.dto.stripe.payment.PaymentResponseUrlDto;
 import ua.team3.carsharingservice.dto.stripe.session.SessionCreateDto;
-import ua.team3.carsharingservice.model.Payment;
 import ua.team3.carsharingservice.service.PaymentService;
 
 @RestController
@@ -31,7 +31,7 @@ public class PaymentController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get payment by id",
             description = "Get payment by his id")
-    public Payment getPaymentById(@PathVariable Long id) {
+    public PaymentDto getPaymentById(@PathVariable Long id) {
         return paymentService.getPaymentById(id);
     }
 
@@ -41,7 +41,7 @@ public class PaymentController {
             description = "Endpoint for creation of payment session")
     public void createPaymentSession(@RequestBody @Valid SessionCreateDto createDto,
                                      HttpServletResponse response) {
-        PaymentResponseDto responseDto = paymentService.createPaymentSession(createDto);
+        PaymentResponseUrlDto responseDto = paymentService.createPaymentSession(createDto);
         response.setHeader(HttpHeaders.LOCATION, responseDto.sessionUrl());
     }
 

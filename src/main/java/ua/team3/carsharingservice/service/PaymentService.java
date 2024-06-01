@@ -1,13 +1,13 @@
 package ua.team3.carsharingservice.service;
 
+import ua.team3.carsharingservice.dto.stripe.payment.PaymentDto;
+import ua.team3.carsharingservice.dto.stripe.payment.PaymentResponseUrlDto;
 import ua.team3.carsharingservice.dto.stripe.session.SessionCreateDto;
-import ua.team3.carsharingservice.dto.stripe.payment.PaymentResponseDto;
-import ua.team3.carsharingservice.model.Payment;
 
 public interface PaymentService {
-    PaymentResponseDto createPaymentSession(SessionCreateDto createDto);
+    PaymentResponseUrlDto createPaymentSession(SessionCreateDto createDto);
 
-    Payment getPaymentById(Long id);
+    PaymentDto getPaymentById(Long id);
 
     String handlePaymentSuccess(String sessionId);
 

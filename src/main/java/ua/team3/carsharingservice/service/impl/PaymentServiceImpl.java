@@ -12,11 +12,13 @@ import java.util.Arrays;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ua.team3.carsharingservice.dto.stripe.payment.PaymentResponseDto;
+import ua.team3.carsharingservice.dto.stripe.payment.PaymentDto;
+import ua.team3.carsharingservice.dto.stripe.payment.PaymentResponseUrlDto;
 import ua.team3.carsharingservice.dto.stripe.session.SessionCreateDto;
 import ua.team3.carsharingservice.exception.InvalidPaymentTypeException;
 import ua.team3.carsharingservice.exception.PaymentProcessedException;
 import ua.team3.carsharingservice.exception.StripeSessionException;
+import ua.team3.carsharingservice.mapper.PaymentMapper;
 import ua.team3.carsharingservice.model.Car;
 import ua.team3.carsharingservice.model.Payment;
 import ua.team3.carsharingservice.model.Payment.Type;
@@ -41,9 +43,10 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentSystemService paymentSystemService;
     private final RentalRepository rentalRepository;
+    private final PaymentMapper paymentMapper;
 
     @Override
-    public PaymentResponseDto createPaymentSession(SessionCreateDto createDto) {
+    public PaymentResponseUrlDto createPaymentSession(SessionCreateDto createDto) {
         Optional<Payment> optionalPayment =
                 paymentRepository.findByRentalId(createDto.getRentalId());
         if (optionalPayment.isPresent() && !optionalPayment.get().getStatus().equals(EXPIRED)) {
@@ -61,14 +64,15 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentSystemService.createPaymentSession(productName, amount, SUCCESS_URL,
                         CANCEL_URL);
         formAndSavePayment(createDto.getPaymentType(), rental, amount, session);
-        return new PaymentResponseDto(session.getUrl());
+        return new PaymentResponseUrlDto(session.getUrl());
     }
 
     @Override
-    public Payment getPaymentById(Long id) {
-        return paymentRepository.findById(id).orElseThrow(
+    public PaymentDto getPaymentById(Long id) {
+        Payment payment = paymentRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Can`t find payment with id " + id)
         );
+        return paymentMapper.toDto(payment);
     }
 
     @Override
