@@ -90,6 +90,12 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return getDefaultTemplate(e, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(PaymentProcessedException.class)
+    public ResponseEntity<Object> handlePaymentProcessedException(
+            PaymentProcessedException e) {
+        return getDefaultTemplate(e, HttpStatus.BAD_REQUEST);
+    }
+
     private ResponseEntity<Object> getDefaultTemplate(Throwable e, HttpStatus status) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put(TIMESTAMP, LocalDateTime.now());
