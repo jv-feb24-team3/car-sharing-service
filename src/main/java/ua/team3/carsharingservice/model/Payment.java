@@ -9,7 +9,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import lombok.Getter;
@@ -29,7 +30,8 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     @Basic(optional = false)
     private Type type;
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rental_id")
     private Rental rental;
     @Column(nullable = false)
     private String sessionUrl;

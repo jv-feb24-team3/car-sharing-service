@@ -47,8 +47,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentResponseUrlDto createPaymentSession(SessionCreateDto createDto) {
+        Type paymentType = getPaymentTypeIfValid(createDto.getPaymentType());
         Optional<Payment> optionalPayment =
-                paymentRepository.findByRentalId(createDto.getRentalId());
+                paymentRepository.findByRentalIdAndType(createDto.getRentalId(), paymentType);
         if (optionalPayment.isPresent() && !optionalPayment.get().getStatus().equals(EXPIRED)) {
             if (optionalPayment.get().getStatus().equals(PAID)) {
                 throw new PaymentProcessedException("The rent has already been paid");
@@ -63,7 +64,7 @@ public class PaymentServiceImpl implements PaymentService {
         Session session =
                 paymentSystemService.createPaymentSession(productName, amount, SUCCESS_URL,
                         CANCEL_URL);
-        formAndSavePayment(createDto.getPaymentType(), rental, amount, session);
+        formAndSavePayment(paymentType, rental, amount, session);
         return new PaymentResponseUrlDto(session.getUrl());
     }
 
@@ -97,13 +98,12 @@ public class PaymentServiceImpl implements PaymentService {
         return PAID_STATUS.equals(session.getPaymentStatus());
     }
 
-    private void formAndSavePayment(String paymentType,
+    private void formAndSavePayment(Type paymentType,
                                     Rental rental,
                                     BigDecimal amountToPay,
                                     Session session) {
         Payment payment = new Payment();
-        Type type = getPaymentTypeIfValid(paymentType);
-        payment.setType(type);
+        payment.setType(paymentType);
         payment.setRental(rental);
         payment.setAmount(amountToPay);
         payment.setStatus(PENDING);
