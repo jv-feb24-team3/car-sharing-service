@@ -43,6 +43,7 @@ class RentalServiceImplTest {
     private static final Long RENTAL_ID = 1L;
     private static final Long USER_ID = 1L;
     private static final Long CAR_ID = 1L;
+    private static final int CAR_INVENTORY = 5;
 
     @Mock
     private RentalRepository rentalRepository;
@@ -66,7 +67,7 @@ class RentalServiceImplTest {
 
         car = new Car();
         car.setId(CAR_ID);
-        car.setInventory(5);
+        car.setInventory(CAR_INVENTORY);
 
         rental = new Rental();
         rental.setId(RENTAL_ID);
@@ -109,6 +110,7 @@ class RentalServiceImplTest {
         RentalDto createdRental = rentalService.create(rentalRequestDto, user);
         assertNotNull(createdRental);
         EqualsBuilder.reflectionEquals(expectedRental, createdRental);
+        assertEquals(CAR_INVENTORY - 1, car.getInventory());
 
         verify(carRepository).findById(rentalRequestDto.getCarId());
         verify(rentalRepository).save(rental);
@@ -175,6 +177,7 @@ class RentalServiceImplTest {
 
         assertNotNull(result);
         assertEquals(rentalDto.getId(), result.getId());
+        assertEquals(CAR_INVENTORY + 1, car.getInventory());
         verify(rentalRepository).findByIdAndUserId(RENTAL_ID, user.getId());
         verify(rentalRepository).save(rental);
     }
