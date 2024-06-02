@@ -5,7 +5,6 @@ import static ua.team3.carsharingservice.model.Payment.Status.PENDING;
 import static ua.team3.carsharingservice.util.StripeConst.CANCELING_MESSAGE;
 import static ua.team3.carsharingservice.util.StripeConst.CANCEL_ENDPOINT;
 import static ua.team3.carsharingservice.util.StripeConst.SESSION_ID_PARAM;
-import static ua.team3.carsharingservice.util.StripeConst.SESSION_ID_VALUE;
 import static ua.team3.carsharingservice.util.StripeConst.STATUS_PAID;
 import static ua.team3.carsharingservice.util.StripeConst.SUCCESS_ENDPOINT;
 import static ua.team3.carsharingservice.util.StripeConst.SUCCESS_MESSAGE;
@@ -124,8 +123,7 @@ public class PaymentServiceImpl implements PaymentService {
     private String buildSuccessUrl() {
         return ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(SUCCESS_ENDPOINT)
-                .queryParam(SESSION_ID_PARAM, SESSION_ID_VALUE)
-                .toUriString();
+                .toUriString() + SESSION_ID_PARAM;
     }
 
     private String buildCancelUrl() {

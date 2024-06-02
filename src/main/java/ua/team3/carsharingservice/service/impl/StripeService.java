@@ -44,7 +44,7 @@ public class StripeService implements PaymentSystemService {
         try {
             session = Session.retrieve(sessionId);
         } catch (StripeException e) {
-            throw new StripeSessionException("Can't retrieve session", e);
+            throw new StripeSessionException("Can't retrieve session with id" + sessionId, e);
         }
         return session;
     }
