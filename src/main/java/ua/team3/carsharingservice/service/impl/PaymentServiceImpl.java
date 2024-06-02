@@ -2,6 +2,13 @@ package ua.team3.carsharingservice.service.impl;
 
 import static ua.team3.carsharingservice.model.Payment.Status.PAID;
 import static ua.team3.carsharingservice.model.Payment.Status.PENDING;
+import static ua.team3.carsharingservice.util.StripeConst.CANCELING_MESSAGE;
+import static ua.team3.carsharingservice.util.StripeConst.CANCEL_ENDPOINT;
+import static ua.team3.carsharingservice.util.StripeConst.SESSION_ID_PARAM;
+import static ua.team3.carsharingservice.util.StripeConst.SESSION_ID_VALUE;
+import static ua.team3.carsharingservice.util.StripeConst.STATUS_PAID;
+import static ua.team3.carsharingservice.util.StripeConst.SUCCESS_ENDPOINT;
+import static ua.team3.carsharingservice.util.StripeConst.SUCCESS_MESSAGE;
 
 import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,17 +36,8 @@ import ua.team3.carsharingservice.service.PaymentSystemService;
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
-    private static final String SUCCESS_ENDPOINT = "/api/payments/success";
-    private static final String CANCEL_ENDPOINT = "/api/payments/cancel";
-    private static final String SESSION_ID_PARAM = "session_id";
-    private static final String SESSION_ID_VALUE = "{CHECKOUT_SESSION_ID}";
-    private static final String SUCCESS_MESSAGE =
-            "Your payment was successful! Your car rental is confirmed.";
-    private static final String CANCELING_MESSAGE =
-            "Your payment was canceled. You can complete your car rental within the next 24 hours.";
-    private static final String STATUS_PAID = "paid";
-    private final PaymentRepository paymentRepository;
     private final PaymentSystemService paymentSystemService;
+    private final PaymentRepository paymentRepository;
     private final RentalRepository rentalRepository;
     private final PaymentMapper paymentMapper;
     private final PaymentHandlerFactory handlerFactory;
@@ -55,7 +53,10 @@ public class PaymentServiceImpl implements PaymentService {
         Type paymentType = getPaymentType(type);
         Optional<Payment> optionalPayment = paymentRepository.findByRentalIdAndType(
                 createDto.getRentalId(), paymentType);
-        Rental rental = rentalRepository.findById(createDto.getRentalId()).get();
+        Rental rental = rentalRepository.findById(createDto.getRentalId()).orElseThrow(
+                () -> new EntityNotFoundException("rental with id: "
+                        + createDto.getRentalId() + " doesn't exist")
+        );
         if (!paymentHandler.canMakePayment(rental, optionalPayment)) {
             throw new StripeSessionException("Can't create payment for rental with id "
                     + rental.getId());
