@@ -25,6 +25,7 @@ import ua.team3.carsharingservice.service.RentalService;
 @RequiredArgsConstructor
 public class RentalServiceImpl implements RentalService {
     private static final int NUM_RENTAL_CARS = 1;
+
     private final RentalRepository rentalRepository;
     private final CarRepository carRepository;
     private final RentalMapper rentalMapper;
@@ -57,16 +58,6 @@ public class RentalServiceImpl implements RentalService {
         rental.setCar(car);
         Rental savedRental = rentalRepository.save(rental);
         return rentalMapper.toDto(savedRental);
-    }
-
-    private void decreaseInventoryInCar(Car car) {
-        int availableCarInventory = car.getInventory();
-        if (availableCarInventory < NUM_RENTAL_CARS) {
-            throw new NoCarsAvailableException(
-                    "There are no available cars of this type, please choose another"
-            );
-        }
-        car.setInventory(availableCarInventory - NUM_RENTAL_CARS);
     }
 
     @Override
@@ -125,5 +116,15 @@ public class RentalServiceImpl implements RentalService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Can't find a rental by id: " + id
                 ));
+    }
+
+    private void decreaseInventoryInCar(Car car) {
+        int availableCarInventory = car.getInventory();
+        if (availableCarInventory < NUM_RENTAL_CARS) {
+            throw new NoCarsAvailableException(
+                    "There are no available cars of this type, please choose another"
+            );
+        }
+        car.setInventory(availableCarInventory - NUM_RENTAL_CARS);
     }
 }
