@@ -13,3 +13,9 @@ databaseChangeLog:
       file: db/changelog/changes/create-payments-table.yml
   - include:
       file: db/changelog/changes/insert-cars-into-cars-table.yaml
+  - include:
+      file: db/changelog/changes/add-roles.yaml
+  - include:
+      file: db/changelog/changes/add-admin.yaml
+  - include:
+      file: db/changelog/changes/assign-role-to-admin.yaml
