@@ -13,5 +13,5 @@ public class RentalDto {
     private LocalDate returnDate;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate actualReturnDate;
-    private CarDto car;
+    private CarWithoutInventoryDto car;
 }

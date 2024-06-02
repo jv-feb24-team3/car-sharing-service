@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -41,15 +42,31 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return new ResponseEntity<>(body, headers, status);
     }
 
-    @ExceptionHandler(EntityNotFoundException.class)
+    @ExceptionHandler({
+            EntityNotFoundException.class,
+            NoCarsAvailableException.class
+    })
     public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException e) {
         return getDefaultTemplate(e, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    @ExceptionHandler({
+            SQLIntegrityConstraintViolationException.class,
+            DataIntegrityViolationException.class,
+    })
     public ResponseEntity<Object> handleSqlIntegrityConstraintViolationException(
-            SQLIntegrityConstraintViolationException e) {
+            Exception e) {
         return getDefaultTemplate(e, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler({
+            NotValidRentalDateException.class,
+            NotValidReturnDateException.class,
+            RentalAlreadyReturnedException.class
+    })
+    public ResponseEntity<Object> handleBadRequestException(
+            Exception e) {
+        return getDefaultTemplate(e, HttpStatus.BAD_REQUEST);
     }
 
     private ResponseEntity<Object> getDefaultTemplate(Throwable e, HttpStatus status) {
