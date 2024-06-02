@@ -46,8 +46,10 @@ public class PaymentController {
     }
 
     @GetMapping("/success")
-    @Operation(summary = "Payment success",
-            description = "Endpoint for successes payment")
+    @Operation(summary = "Payment success redirection",
+            description = "This endpoint is used by Stripe "
+                    + "to redirect the user after a successful payment. "
+                    + "It is not intended to be called directly.")
     public String paymentSuccess(@RequestParam("session_id") String sessionId) {
         if (paymentService.isPaymentStatusPaid(sessionId)) {
             return paymentService.handlePaymentSuccess(sessionId);
@@ -56,8 +58,10 @@ public class PaymentController {
     }
 
     @GetMapping("/cancel")
-    @Operation(summary = "Payment cancel",
-            description = "Endpoint for canceled payment")
+    @Operation(summary = "Payment cancel redirection",
+            description = "This endpoint is used by Stripe "
+                    + "to redirect the user after a cancelled payment. "
+                    + "It is not intended to be called directly.")
     public String paymentCancel() {
         return paymentService.handlePaymentCanceling();
     }
