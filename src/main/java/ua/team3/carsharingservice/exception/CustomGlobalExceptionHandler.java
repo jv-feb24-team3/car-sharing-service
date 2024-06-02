@@ -69,6 +69,14 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return getDefaultTemplate(e, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler({
+            ForbiddenRentalCreationException.class,
+    })
+    public ResponseEntity<Object> handleForbiddenRequestException(
+            Exception e) {
+        return getDefaultTemplate(e, HttpStatus.FORBIDDEN);
+    }
+
     private ResponseEntity<Object> getDefaultTemplate(Throwable e, HttpStatus status) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put(TIMESTAMP, LocalDateTime.now());

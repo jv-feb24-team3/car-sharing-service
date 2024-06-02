@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.team3.carsharingservice.dto.RentalDto;
 import ua.team3.carsharingservice.dto.RentalRequestDto;
+import ua.team3.carsharingservice.exception.ForbiddenRentalCreationException;
 import ua.team3.carsharingservice.exception.NoCarsAvailableException;
 import ua.team3.carsharingservice.exception.NotValidRentalDateException;
 import ua.team3.carsharingservice.exception.NotValidReturnDateException;
@@ -98,7 +99,7 @@ public class RentalServiceImpl implements RentalService {
                 .anyMatch(rental -> rental.getActualReturnDate() == null
                         && rental.getReturnDate().isBefore(LocalDate.now()));
         if (hasOverdueRentals) {
-            throw new NoCarsAvailableException(
+            throw new ForbiddenRentalCreationException(
                     "The user has overdue car rentals"
             );
         }
