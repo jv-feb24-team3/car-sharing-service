@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ua.team3.carsharingservice.model.Payment;
 import ua.team3.carsharingservice.model.Rental;
@@ -13,7 +14,8 @@ import ua.team3.carsharingservice.service.PaymentHandler;
 @Component("FINE")
 @RequiredArgsConstructor
 public class PaymentHandlerForFine implements PaymentHandler {
-    private static final BigDecimal FAIN_MULTIPLY = BigDecimal.valueOf(1.3);
+    @Value("${fine.multiplayer}")
+    private BigDecimal FINE_MULTIPLAYER;
 
     @Override
     public long calculateDays(Rental rental) {
@@ -22,7 +24,7 @@ public class PaymentHandlerForFine implements PaymentHandler {
 
     @Override
     public BigDecimal calculateAmount(BigDecimal dailyFee, long rentalDays) {
-        return FAIN_MULTIPLY.multiply(dailyFee).multiply(BigDecimal.valueOf(rentalDays));
+        return FINE_MULTIPLAYER.multiply(dailyFee).multiply(BigDecimal.valueOf(rentalDays));
     }
 
     @Override
