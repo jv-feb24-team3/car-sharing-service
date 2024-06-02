@@ -61,8 +61,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler({
             NotValidRentalDateException.class,
-            NotValidReturnDateException.class,
-            RentalAlreadyReturnedException.class
+            NotValidReturnDateException.class
     })
     public ResponseEntity<Object> handleBadRequestException(
             Exception e) {
@@ -71,6 +70,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler({
             ForbiddenRentalCreationException.class,
+            RentalAlreadyReturnedException.class
     })
     public ResponseEntity<Object> handleForbiddenRequestException(
             Exception e) {
