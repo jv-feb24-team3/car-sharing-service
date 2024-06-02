@@ -48,7 +48,7 @@ public class CarController {
             description = "Returns a paginated list of cars for every user",
             parameters =
             @Parameter(name = "pageable",
-            description = "Pagination information (page number and size")
+            description = "Pagination information (page number, size and sorting")
     )
     @GetMapping
     public List<CarDto> getAllCars(Pageable pageable) {
@@ -91,9 +91,9 @@ public class CarController {
             @Parameter(name = "carId",
                     description = "Id of the car to be deleted", required = true))
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{cardId}")
+    @DeleteMapping("/{carId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCarById(@PathVariable Long cardId) {
-        carService.deleteById(cardId);
+    public void deleteCarById(@PathVariable Long carId) {
+        carService.deleteById(carId);
     }
 }
