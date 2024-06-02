@@ -67,16 +67,6 @@ public class CarController {
         return carService.findCarById(carId);
     }
 
-    @Operation(
-            summary = "Update car by id",
-            description = "Update data about a car by its id. "
-                    + "Only accessible by users with the ADMIN role.",
-            parameters = {
-                    @Parameter(name = "carId",
-                            description = "ID of the car to be updated", required = true),
-                    @Parameter(name = "requestDto",
-                            description = "DTO containing updated car details", required = true)
-            })
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{carId}")
     public CarDto updateCarById(@PathVariable Long carId,
