@@ -24,7 +24,7 @@ import ua.team3.carsharingservice.service.RentalService;
 @Service
 @RequiredArgsConstructor
 public class RentalServiceImpl implements RentalService {
-    private static final int NUM_RENTAL_CARS = 1;
+    private static final int DEFAULT_CAR_COUNT = 1;
 
     private final RentalRepository rentalRepository;
     private final CarRepository carRepository;
@@ -67,7 +67,7 @@ public class RentalServiceImpl implements RentalService {
         ensureRentalNotReturned(rental);
 
         rental.setActualReturnDate(LocalDate.now());
-        rental.getCar().setInventory(rental.getCar().getInventory() + NUM_RENTAL_CARS);
+        rental.getCar().setInventory(rental.getCar().getInventory() + DEFAULT_CAR_COUNT);
         Rental savedRental = rentalRepository.save(rental);
         return rentalMapper.toDto(savedRental);
     }
@@ -120,11 +120,11 @@ public class RentalServiceImpl implements RentalService {
 
     private void decreaseInventoryInCar(Car car) {
         int availableCarInventory = car.getInventory();
-        if (availableCarInventory < NUM_RENTAL_CARS) {
+        if (availableCarInventory < DEFAULT_CAR_COUNT) {
             throw new NoCarsAvailableException(
                     "There are no available cars of this type, please choose another"
             );
         }
-        car.setInventory(availableCarInventory - NUM_RENTAL_CARS);
+        car.setInventory(availableCarInventory - DEFAULT_CAR_COUNT);
     }
 }
