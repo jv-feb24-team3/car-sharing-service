@@ -68,13 +68,13 @@ class RentalServiceImplTest {
         car.setId(CAR_ID);
         car.setInventory(5);
 
-        LocalDate rentalDate = LocalDate.now();
-        LocalDate returnDate = rentalDate.plusDays(4);
-
         rental = new Rental();
         rental.setId(RENTAL_ID);
         rental.setUser(user);
         rental.setCar(car);
+
+        LocalDate rentalDate = LocalDate.now();
+        LocalDate returnDate = rentalDate.plusDays(4);
         rental.setRentalDate(rentalDate);
         rental.setReturnDate(returnDate);
 
