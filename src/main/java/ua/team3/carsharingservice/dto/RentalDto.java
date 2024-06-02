@@ -6,12 +6,14 @@ import lombok.Data;
 
 @Data
 public class RentalDto {
+    private static final String DATE_PATTERN = "yyyy-MM-dd";
+
     private Long id;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = DATE_PATTERN)
     private LocalDate rentalDate;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = DATE_PATTERN)
     private LocalDate returnDate;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = DATE_PATTERN)
     private LocalDate actualReturnDate;
     private CarWithoutInventoryDto car;
 }
