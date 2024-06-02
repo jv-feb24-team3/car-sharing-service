@@ -7,8 +7,6 @@ import static ua.team3.carsharingservice.model.Payment.Status.PENDING;
 import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +23,7 @@ import ua.team3.carsharingservice.model.Payment.Type;
 import ua.team3.carsharingservice.model.Rental;
 import ua.team3.carsharingservice.repository.PaymentRepository;
 import ua.team3.carsharingservice.repository.RentalRepository;
+import ua.team3.carsharingservice.service.PaymentHandler;
 import ua.team3.carsharingservice.service.PaymentService;
 import ua.team3.carsharingservice.service.PaymentSystemService;
 
@@ -44,10 +43,17 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentSystemService paymentSystemService;
     private final RentalRepository rentalRepository;
     private final PaymentMapper paymentMapper;
+    private final PaymentHandlerFactory handlerFactory;
 
     @Override
     public PaymentResponseUrlDto createPaymentSession(SessionCreateDto createDto) {
-        Type paymentType = getPaymentTypeIfValid(createDto.getPaymentType());
+        String type = createDto.getPaymentType().toUpperCase();
+        PaymentHandler paymentHandler = handlerFactory.getHandler(type);
+        if (paymentHandler == null) {
+                throw new InvalidPaymentTypeException("Payment type "
+                        + createDto.getPaymentType() + " doesn't exist");
+        }
+        Type paymentType = getPaymentType(type);
         Optional<Payment> optionalPayment =
                 paymentRepository.findByRentalIdAndType(createDto.getRentalId(), paymentType);
         if (optionalPayment.isPresent() && !optionalPayment.get().getStatus().equals(EXPIRED)) {
@@ -58,11 +64,10 @@ public class PaymentServiceImpl implements PaymentService {
         }
         Rental rental = rentalRepository.findById(createDto.getRentalId()).get();
         Car car = rental.getCar();
-        long rentalDays = ChronoUnit.DAYS.between(rental.getRentalDate(), rental.getReturnDate());
-        BigDecimal amount = car.getDailyFee().multiply(BigDecimal.valueOf(rentalDays));
-        String productName = car.getBrand();
+        long rentalDays = paymentHandler.calculateDays(rental);
+        BigDecimal amount = paymentHandler.calculateAmount(car.getDailyFee(), rentalDays);
         Session session =
-                paymentSystemService.createPaymentSession(productName, amount, SUCCESS_URL,
+                paymentSystemService.createPaymentSession(car.getBrand(), amount, SUCCESS_URL,
                         CANCEL_URL);
         formAndSavePayment(paymentType, rental, amount, session);
         return new PaymentResponseUrlDto(session.getUrl());
@@ -112,13 +117,7 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
     }
 
-    private Type getPaymentTypeIfValid(String paymentType) {
-        return Arrays.stream(Type.values())
-                .filter(type -> type.name().equals(paymentType.toUpperCase()))
-                .findFirst()
-                .orElseThrow(
-                        () -> new InvalidPaymentTypeException("Payment type "
-                                + paymentType + " doesn't exist")
-                );
+    private Type getPaymentType(String paymentType) {
+        return Type.valueOf(paymentType);
     }
 }
