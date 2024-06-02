@@ -21,6 +21,7 @@ import ua.team3.carsharingservice.service.PaymentSystemService;
 @RequiredArgsConstructor
 public class StripeService implements PaymentSystemService {
     private static final Long CONVERSATION_RATE = 100L;
+    private static final Long SESSION_DURATION = 24L;
     private static final Long DEFAULT_QUANTITY = 1L;
     private static final String CURRENCY = "USD";
 
@@ -52,7 +53,7 @@ public class StripeService implements PaymentSystemService {
                                                    BigDecimal amount,
                                                    String successUrl,
                                                    String cancelUrl) {
-        long expiresAt = Instant.now().plus(24, ChronoUnit.HOURS).getEpochSecond();
+        long expiresAt = Instant.now().plus(SESSION_DURATION, ChronoUnit.HOURS).getEpochSecond();
         return SessionCreateParams.builder()
                 .addPaymentMethodType(PaymentMethodType.CARD)
                 .setMode(Mode.PAYMENT)
