@@ -115,6 +115,10 @@ class CarControllerTest {
     }
 
     @Test
+    @Sql(scripts = "classpath:data/add-cars-into-table.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "classpath:data/delete-from-car-table.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @WithMockUser(username = "admin", roles = "ADMIN")
     void deleteCarById_validData_success() throws Exception {
         mockMvc.perform(delete(CARS_BY_ID_URL, CAR_ID))
@@ -122,6 +126,10 @@ class CarControllerTest {
     }
 
     @Test
+    @Sql(scripts = "classpath:data/add-cars-into-table.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "classpath:data/delete-from-car-table.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @WithMockUser(username = "user", roles = "USER")
     @DisplayName("Delete book by id with invalid role")
     void deleteCarById_WIthInValidRoleUser_fail() throws Exception {
