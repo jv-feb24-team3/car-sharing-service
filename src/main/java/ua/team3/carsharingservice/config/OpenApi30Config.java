@@ -4,9 +4,12 @@ import static org.springframework.security.config.Elements.JWT;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +30,11 @@ public class OpenApi30Config {
 
     @Bean
     public OpenAPI customOpenApi() {
+        PathItem pathItem = new PathItem();
+        Operation operation = new Operation();
+        operation.setSecurity(new ArrayList<>());
+        pathItem.post(operation);
+
         return new OpenAPI()
                 .components(new Components().addSecuritySchemes(BEARER_AUTH,
                         new SecurityScheme()
@@ -34,6 +42,9 @@ public class OpenApi30Config {
                                 .scheme(BEARER)
                                 .bearerFormat(JWT)))
                 .info(new Info().title(apiTitle).version(apiVersion))
-                .addSecurityItem(new SecurityRequirement().addList(BEARER_AUTH));
+                .addSecurityItem(new SecurityRequirement().addList(BEARER_AUTH))
+                .path("/auth/register", pathItem)
+                .path("/auth/login", pathItem)
+                .path("/cars", pathItem);
     }
 }
