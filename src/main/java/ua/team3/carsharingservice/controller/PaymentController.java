@@ -35,11 +35,21 @@ public class PaymentController {
     @GetMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Get payment all payments",
+    @Operation(summary = "Get all payments by user id",
             description = "Get payment by his id")
     public List<PaymentDto> getPaymentsByUser(@PathVariable Long userId,
                                                   Pageable pageable) {
         return paymentService.getPaymentsByUserId(userId, pageable);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get all payments",
+            description = "Get list of all payments")
+    public List<PaymentDto> getAllPayments(@AuthenticationPrincipal User user,
+                                              Pageable pageable) {
+        return paymentService.getAllPayments(user, pageable);
     }
 
     @PostMapping
@@ -50,7 +60,7 @@ public class PaymentController {
     public void createPaymentSession(@RequestBody @Valid SessionCreateDto createDto,
                                      @AuthenticationPrincipal User user,
                                      HttpServletResponse response) {
-        PaymentResponseUrlDto responseDto = paymentService.createPaymentSession(createDto);
+        PaymentResponseUrlDto responseDto = paymentService.createPaymentSession(createDto, user);
         response.setHeader(HttpHeaders.LOCATION, responseDto.sessionUrl());
     }
 
