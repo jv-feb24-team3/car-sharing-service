@@ -100,8 +100,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<PaymentDto> getAllPayments(User user, Pageable pageable) {
-        return user.isAdmin() ?
-                getAllPaymentsForAdmin(pageable) : getAllPaymentsByUser(user, pageable);
+        return user.isAdmin() ? getAllPaymentsForAdmin(pageable) :
+                        getAllPaymentsByUser(user, pageable);
     }
 
     @Override
