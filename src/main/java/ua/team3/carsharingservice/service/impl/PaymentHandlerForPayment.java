@@ -11,7 +11,7 @@ import ua.team3.carsharingservice.service.PaymentHandler;
 
 @Component("PAYMENT")
 @RequiredArgsConstructor
-public class PaymentHadlerForPayment implements PaymentHandler {
+public class PaymentHandlerForPayment implements PaymentHandler {
 
     @Override
     public long calculateDays(Rental rental) {
