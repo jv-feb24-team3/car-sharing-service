@@ -77,8 +77,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return getDefaultTemplate(e, HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(NotificationServiceInternalException.class)
-    public ResponseEntity<Object> handleNotificationServiceInternalException(
+    @ExceptionHandler(NotificationSendingException.class)
+    public ResponseEntity<Object> handleNotificationSendingException(
             Exception e
     ) {
         return getDefaultTemplate(e, HttpStatus.INTERNAL_SERVER_ERROR);
