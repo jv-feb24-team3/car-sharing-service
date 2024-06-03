@@ -13,8 +13,10 @@ import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.team3.carsharingservice.dto.stripe.payment.PaymentDto;
@@ -74,11 +76,14 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentDto getPaymentById(Long id) {
-        Payment payment = paymentRepository.findById(id).orElseThrow(
-
-        );
-        return paymentMapper.toDto(payment);
+    public List<PaymentDto> getPaymentsByUserId(Long userId, Pageable pageable) {
+        List<Payment> paymentList = paymentRepository.findPaymentsByUserId(userId, pageable);
+        if (paymentList.isEmpty()) {
+            throw new EntityNotFoundException("User with id " + userId + "payment history is empty");
+        }
+        return paymentList.stream()
+                .map(paymentMapper::toDto)
+                .toList();
     }
 
     @Override

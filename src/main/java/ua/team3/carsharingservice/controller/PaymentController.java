@@ -4,9 +4,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ua.team3.carsharingservice.dto.stripe.payment.PaymentDto;
 import ua.team3.carsharingservice.dto.stripe.payment.PaymentResponseUrlDto;
 import ua.team3.carsharingservice.dto.stripe.session.SessionCreateDto;
+import ua.team3.carsharingservice.model.User;
 import ua.team3.carsharingservice.service.PaymentService;
 
 @RestController
@@ -27,19 +32,23 @@ import ua.team3.carsharingservice.service.PaymentService;
 public class PaymentController {
     private final PaymentService paymentService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Get payment by id",
+    @Operation(summary = "Get payment all payments",
             description = "Get payment by his id")
-    public PaymentDto getPaymentById(@PathVariable Long id) {
-        return paymentService.getPaymentById(id);
+    public List<PaymentDto> getPaymentsByUser(@PathVariable Long userId,
+                                                  Pageable pageable) {
+        return paymentService.getPaymentsByUserId(userId, pageable);
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @ResponseStatus(HttpStatus.SEE_OTHER)
     @Operation(summary = "Create payment session",
             description = "Endpoint for creation of payment session")
     public void createPaymentSession(@RequestBody @Valid SessionCreateDto createDto,
+                                     @AuthenticationPrincipal User user,
                                      HttpServletResponse response) {
         PaymentResponseUrlDto responseDto = paymentService.createPaymentSession(createDto);
         response.setHeader(HttpHeaders.LOCATION, responseDto.sessionUrl());

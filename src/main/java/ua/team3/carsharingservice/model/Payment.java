@@ -33,9 +33,7 @@ public class Payment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rental_id")
     private Rental rental;
-    @Column(unique = true)
     private String sessionUrl;
-    @Column(unique = true)
     private String sessionId;
     @Column(nullable = false)
     private BigDecimal amount;

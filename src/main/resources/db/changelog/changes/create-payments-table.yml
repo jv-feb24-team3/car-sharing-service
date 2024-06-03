@@ -32,13 +32,9 @@ databaseChangeLog:
               - column:
                    name: session_url
                    type: varchar(2048)
-                   constraints:
-                     unique: true
               - column:
                   name: session_id
                   type: varchar(255)
-                  constraints:
-                    unique: true
               - column:
                   name: amount
                   type: decimal(38,2)
