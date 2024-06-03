@@ -9,7 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.team3.carsharingservice.dto.UserRegistrationRequestDto;
 import ua.team3.carsharingservice.dto.UserResponseDto;
+import ua.team3.carsharingservice.dto.UserRoleUpdateDto;
 import ua.team3.carsharingservice.dto.UserUpdateRequestDto;
+import ua.team3.carsharingservice.exception.EntityNotFoundException;
 import ua.team3.carsharingservice.exception.RegistrationException;
 import ua.team3.carsharingservice.mapper.UserMapper;
 import ua.team3.carsharingservice.model.Role;
@@ -45,12 +47,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserRole(Long userId, Role.RoleName role) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalArgumentException("User not found!")
+    public void updateUserRole(UserRoleUpdateDto updateDto) {
+        User user = userRepository.findById(updateDto.getUserId()).orElseThrow(
+                () -> new IllegalArgumentException("User with id: "
+                        + updateDto.getUserId() + " not found!")
         );
-        Role newRole = roleRepository.findByRole(role).orElseThrow(
-                () -> new IllegalArgumentException("Role not found!")
+        Role newRole = roleRepository.findByRole(updateDto.getRole()).orElseThrow(
+                () -> new IllegalArgumentException("Role: "
+                        + updateDto.getRole() + " not found!")
         );
         user.setRoles(Collections.singleton(newRole));
         userRepository.save(user);
@@ -59,7 +63,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto getUserByEmail(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new IllegalArgumentException("User not found!")
+                () -> new EntityNotFoundException("User with email: "
+                        + email + " not found!")
         );
         return userMapper.toDto(user);
     }
@@ -70,7 +75,8 @@ public class UserServiceImpl implements UserService {
             UserUpdateRequestDto userUpdateRequestDto
     ) {
         User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new IllegalArgumentException("User not found!")
+                () -> new EntityNotFoundException("User with email: "
+                        + email + " not found!")
         );
         user.setFirstName(userUpdateRequestDto.getFirstName());
         user.setLastName(userUpdateRequestDto.getLastName());

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ua.team3.carsharingservice.dto.UserResponseDto;
+import ua.team3.carsharingservice.dto.UserRoleUpdateDto;
 import ua.team3.carsharingservice.dto.UserUpdateRequestDto;
 import ua.team3.carsharingservice.model.Role;
 import ua.team3.carsharingservice.service.UserService;
@@ -22,16 +23,18 @@ public class UsersController {
     private final UserService userService;
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}/role")
-    public void updateUserRole(@PathVariable Long id, @RequestParam Role.RoleName role) {
-        userService.updateUserRole(id, role);
+    @PutMapping("role")
+    public void updateUserRole(@Valid @RequestBody UserRoleUpdateDto updateDto) {
+        userService.updateUserRole(updateDto);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/me")
     public UserResponseDto getMyProfile() {
         return userService.getCurrentUserProfile();
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @PutMapping("/me")
     public UserResponseDto updateMyProfile(
             @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto
