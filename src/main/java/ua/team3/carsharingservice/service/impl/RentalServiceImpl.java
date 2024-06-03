@@ -21,6 +21,7 @@ import ua.team3.carsharingservice.model.User;
 import ua.team3.carsharingservice.repository.CarRepository;
 import ua.team3.carsharingservice.repository.RentalRepository;
 import ua.team3.carsharingservice.service.RentalService;
+import ua.team3.carsharingservice.telegram.service.NotificationService;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class RentalServiceImpl implements RentalService {
     private final RentalRepository rentalRepository;
     private final CarRepository carRepository;
     private final RentalMapper rentalMapper;
+    private final NotificationService notificationService;
 
     @Override
     public List<RentalDto> getAll(User user, Pageable pageable) {
@@ -58,6 +60,7 @@ public class RentalServiceImpl implements RentalService {
         rental.setUser(user);
         rental.setCar(car);
         Rental savedRental = rentalRepository.save(rental);
+        notificationService.sendRentalCreatedNotification(savedRental);
         return rentalMapper.toDto(savedRental);
     }
 

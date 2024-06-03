@@ -18,9 +18,10 @@ public class TelegramBotConfiguration {
     public TelegramBot telegramBot(
             @Value("${bot.token}") String token,
             @Value("${bot.name}") String botName,
+            @Value("${admin.chat.id}") String adminChatId,
             TelegramBotsApi telegramBotsApi
     ) {
-        var bot = new TelegramBot(token, botName);
+        var bot = new TelegramBot(token, botName, adminChatId);
         telegramBotsApi.registerBot(bot);
         return bot;
     }

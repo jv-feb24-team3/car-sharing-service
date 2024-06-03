@@ -77,6 +77,13 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return getDefaultTemplate(e, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(NotificationServiceInternalException.class)
+    public ResponseEntity<Object> handleNotificationServiceInternalException(
+            Exception e
+    ) {
+        return getDefaultTemplate(e, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     private ResponseEntity<Object> getDefaultTemplate(Throwable e, HttpStatus status) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put(TIMESTAMP, LocalDateTime.now());
