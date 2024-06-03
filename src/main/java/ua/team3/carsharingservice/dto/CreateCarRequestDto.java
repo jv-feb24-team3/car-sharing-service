@@ -3,6 +3,7 @@ package ua.team3.carsharingservice.dto;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import lombok.Data;
 
@@ -14,7 +15,7 @@ public class CreateCarRequestDto {
     private String type;
     @Min(value = 1, message = "You can't add less than 1")
     private int inventory;
-    @NotBlank(message = "Daily fee may not be empty")
+    @NotNull(message = "Daily fee may not be empty")
     @DecimalMin(value = "0.0", inclusive = false, message = "Daily fee must be greater than zero")
     private BigDecimal dailyFee;
 }
