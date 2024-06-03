@@ -89,4 +89,9 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public boolean isAdmin() {
+        return roles.stream()
+                .anyMatch(r -> r.getRole().equals(Role.RoleName.ADMIN));
+    }
 }
