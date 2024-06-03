@@ -132,7 +132,7 @@ public class RentalServiceImpl implements RentalService {
                 ));
     }
 
-    private Rental getRentalByIdForUser(Long id, User user) { {
+    private Rental getRentalByIdForUser(Long id, User user) {
         boolean isUserAdmin = user.isAdmin();
         Optional<Rental> optionalRental = isUserAdmin
                 ? rentalRepository.findById(id)
@@ -142,7 +142,6 @@ public class RentalServiceImpl implements RentalService {
                 () -> new EntityNotFoundException("Can't find a rental by id: " + id)
         );
     }
-
 
     private void decreaseInventoryInCar(Car car) {
         int availableCarInventory = car.getInventory();
