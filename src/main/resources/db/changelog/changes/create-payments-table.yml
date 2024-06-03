@@ -33,12 +33,11 @@ databaseChangeLog:
                    name: session_url
                    type: varchar(2048)
                    constraints:
-                     nullable: false
+                     unique: true
               - column:
                   name: session_id
                   type: varchar(255)
                   constraints:
-                    nullable: false
                     unique: true
               - column:
                   name: amount
