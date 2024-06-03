@@ -1,8 +1,5 @@
 package ua.team3.carsharingservice.service.impl;
 
-import static ua.team3.carsharingservice.model.Payment.Type.FINE;
-import static ua.team3.carsharingservice.model.Payment.Type.PAYMENT;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
@@ -71,7 +68,8 @@ public class RentalServiceImpl implements RentalService {
         rental.setUser(user);
         rental.setCar(car);
         Rental savedRental = rentalRepository.save(rental);
-        paymentService.createPayment(PAYMENT, savedRental);
+
+        paymentService.createPaymentForRental(savedRental);
         notificationService.sendRentalCreatedNotification(savedRental);
         return rentalMapper.toDto(savedRental);
     }
@@ -85,9 +83,7 @@ public class RentalServiceImpl implements RentalService {
         rental.setActualReturnDate(LocalDate.now());
         rental.getCar().setInventory(rental.getCar().getInventory() + DEFAULT_CAR_COUNT);
         Rental savedRental = rentalRepository.save(rental);
-        if (isRentOverdue(savedRental)) {
-            paymentService.createPayment(FINE, savedRental);
-        }
+        paymentService.createFinePaymentIfNeeded(savedRental);
         return rentalMapper.toDto(savedRental);
     }
 
@@ -136,7 +132,7 @@ public class RentalServiceImpl implements RentalService {
                 ));
     }
 
-    private Rental getRentalByIdForUser(Long id, User user) {
+    private Rental getRentalByIdForUser(Long id, User user) { {
         boolean isUserAdmin = user.isAdmin();
         Optional<Rental> optionalRental = isUserAdmin
                 ? rentalRepository.findById(id)
@@ -145,6 +141,11 @@ public class RentalServiceImpl implements RentalService {
         return optionalRental.orElseThrow(
                 () -> new EntityNotFoundException("Can't find a rental by id: " + id)
         );
+    }
+
+    private boolean isRentOverdue(Rental rental) {
+        return rental.getActualReturnDate() == null
+                && rental.getReturnDate().isBefore(LocalDate.now());
     }
 
     private void decreaseInventoryInCar(Car car) {

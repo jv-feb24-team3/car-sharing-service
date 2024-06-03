@@ -12,6 +12,7 @@ import static ua.team3.carsharingservice.util.StripeConst.SUCCESS_MESSAGE;
 import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -68,7 +69,7 @@ public class PaymentServiceImpl implements PaymentService {
         Session session =
                 paymentSystemService.createPaymentSession(car.getBrand(), amount, successUrl,
                         cancelUrl);
-        createPayment(paymentType, rental);
+        setSessionToPayment(optionalPayment.get(), amount, session);
         return new PaymentResponseUrlDto(session.getUrl());
     }
 
@@ -103,11 +104,24 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void createPayment(Type paymentType,
-                               Rental rental) {
+    public void createPaymentForRental(Rental rental) {
+        createPayment(Type.PAYMENT, rental);
+    }
+
+    @Override
+    public void createFinePaymentIfNeeded(Rental rental) {
+        LocalDate actualReturnDate = rental.getActualReturnDate();
+        LocalDate returnDate = rental.getReturnDate();
+        if (actualReturnDate != null
+                && returnDate.isBefore(actualReturnDate)) {
+            createPayment(Type.FINE, rental);
+        }
+    }
+
+    private void createPayment(Type paymentType, Rental rental) {
         Payment payment = new Payment();
-        payment.setType(paymentType);
         payment.setRental(rental);
+        payment.setType(paymentType);
         payment.setStatus(PENDING);
         paymentRepository.save(payment);
     }

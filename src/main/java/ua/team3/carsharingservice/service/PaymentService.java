@@ -1,7 +1,5 @@
 package ua.team3.carsharingservice.service;
 
-import static ua.team3.carsharingservice.model.Payment.Type;
-
 import ua.team3.carsharingservice.dto.stripe.payment.PaymentDto;
 import ua.team3.carsharingservice.dto.stripe.payment.PaymentResponseUrlDto;
 import ua.team3.carsharingservice.dto.stripe.session.SessionCreateDto;
@@ -18,5 +16,7 @@ public interface PaymentService {
 
     boolean isPaymentStatusPaid(String sessionId);
 
-    void createPayment(Type paymentType, Rental rental);
+    void createPaymentForRental(Rental rental);
+
+    void createFinePaymentIfNeeded(Rental rental);
 }
