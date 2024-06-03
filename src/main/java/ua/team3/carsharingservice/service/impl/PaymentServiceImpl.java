@@ -29,6 +29,7 @@ import ua.team3.carsharingservice.exception.InvalidPaymentTypeException;
 import ua.team3.carsharingservice.mapper.PaymentMapper;
 import ua.team3.carsharingservice.model.Car;
 import ua.team3.carsharingservice.model.Payment;
+import ua.team3.carsharingservice.model.Payment.Type;
 import ua.team3.carsharingservice.model.Rental;
 import ua.team3.carsharingservice.model.User;
 import ua.team3.carsharingservice.repository.PaymentRepository;
@@ -53,7 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
                         () -> new EntityNotFoundException("You don't have rental with id: "
                                 + createDto.getRentalId())
         );
-        Payment.Type paymentType = getPaymentTypeIfValid(createDto.getPaymentType());
+        Type paymentType = getPaymentTypeIfValid(createDto.getPaymentType());
         Optional<Payment> optionalPayment = paymentRepository.findByRentalIdAndType(
                 createDto.getRentalId(), paymentType);
         if (optionalPayment.isEmpty()) {
@@ -102,6 +103,40 @@ public class PaymentServiceImpl implements PaymentService {
         return user.isAdmin() ? getAllPayments(pageable) : getAllPaymentsByUser(user, pageable);
     }
 
+    @Override
+    public boolean isPaymentStatusPaid(String sessionId) {
+        Session session = paymentSystemService.getSession(sessionId);
+        return STATUS_PAID.equals(session.getPaymentStatus());
+    }
+
+    @Override
+    public void createPaymentForRental(Rental rental) {
+        createPayment(PAYMENT, rental);
+    }
+
+    @Override
+    public void createFinePaymentIfNeeded(Rental rental) {
+        LocalDate actualReturnDate = rental.getActualReturnDate();
+        LocalDate returnDate = rental.getReturnDate();
+        if (actualReturnDate != null
+                && returnDate.isBefore(actualReturnDate)) {
+            createPayment(FINE, rental);
+        }
+    }
+
+    private void createPayment(Type paymentType, Rental rental) {
+        Payment payment = new Payment();
+        payment.setRental(rental);
+        payment.setType(paymentType);
+        payment.setStatus(PENDING);
+        PaymentHandler paymentHandler = handlerFactory.getHandler(paymentType.name());
+        long rentalDays = paymentHandler.calculateDays(rental);
+        BigDecimal amount =
+                paymentHandler.calculateAmount(rental.getCar().getDailyFee(), rentalDays);
+        payment.setAmount(amount);
+        paymentRepository.save(payment);
+    }
+
     private List<PaymentDto> getAllPayments(Pageable pageable) {
         return paymentRepository.findAll(pageable)
                 .stream()
@@ -111,43 +146,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     private List<PaymentDto> getAllPaymentsByUser(User user, Pageable pageable) {
         return paymentRepository.findPaymentsByUserId(user.getId(), pageable)
-                        .stream()
-                        .map(paymentMapper::toDto)
-                        .toList();
-    }
-
-    @Override
-    public boolean isPaymentStatusPaid(String sessionId) {
-        Session session = paymentSystemService.getSession(sessionId);
-        return STATUS_PAID.equals(session.getPaymentStatus());
-    }
-
-    @Override
-    public void createPaymentForRental(Rental rental) {
-        createPayment(PAYMENT.name(), rental);
-    }
-
-    @Override
-    public void createFinePaymentIfNeeded(Rental rental) {
-        LocalDate actualReturnDate = rental.getActualReturnDate();
-        LocalDate returnDate = rental.getReturnDate();
-        if (actualReturnDate != null
-                && returnDate.isBefore(actualReturnDate)) {
-            createPayment(FINE.name(), rental);
-        }
-    }
-
-    private void createPayment(String paymentType, Rental rental) {
-        Payment payment = new Payment();
-        payment.setRental(rental);
-        payment.setType(Payment.Type.valueOf(paymentType));
-        payment.setStatus(PENDING);
-        PaymentHandler paymentHandler = handlerFactory.getHandler(paymentType);
-        long rentalDays = paymentHandler.calculateDays(rental);
-        BigDecimal amount =
-                paymentHandler.calculateAmount(rental.getCar().getDailyFee(), rentalDays);
-        payment.setAmount(amount);
-        paymentRepository.save(payment);
+                .stream()
+                .map(paymentMapper::toDto)
+                .toList();
     }
 
     private void setSessionToPayment(Payment payment, Session session) {
@@ -156,8 +157,8 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
     }
 
-    private Payment.Type getPaymentTypeIfValid(String paymentType) {
-        return Arrays.stream(Payment.Type.values())
+    private Type getPaymentTypeIfValid(String paymentType) {
+        return Arrays.stream(Type.values())
                 .filter(type -> type.name().equalsIgnoreCase(paymentType))
                 .findFirst()
                 .orElseThrow(() -> new InvalidPaymentTypeException("Payment type "
