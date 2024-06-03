@@ -4,6 +4,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,17 +34,21 @@ public class RentalServiceImpl implements RentalService {
     private final RentalMapper rentalMapper;
 
     @Override
-    public List<RentalDto> getAll(User user, Pageable pageable) {
-        return rentalRepository.findByUserId(user.getId(), pageable)
-                .stream()
-                .map(rentalMapper::toDto)
+    public List<? extends RentalDto> getAll(User user, Pageable pageable) {
+        boolean isUserAdmin = user.isAdmin();
+        List<Rental> rentals = isUserAdmin
+                ? rentalRepository.findAll(pageable).getContent()
+                : rentalRepository.findByUserId(user.getId(), pageable);
+
+        return rentals.stream()
+                .map(getRentalMapper(isUserAdmin))
                 .toList();
     }
 
     @Override
-    public RentalDto getById(Long id, User user) {
+    public <T extends RentalDto> T getById(Long id, User user) {
         Rental rental = getRentalByIdForUser(id, user);
-        return rentalMapper.toDto(rental);
+        return (T) getRentalMapper(user.isAdmin()).apply(rental);
     }
 
     @Override
@@ -71,6 +77,12 @@ public class RentalServiceImpl implements RentalService {
         rental.getCar().setInventory(rental.getCar().getInventory() + DEFAULT_CAR_COUNT);
         Rental savedRental = rentalRepository.save(rental);
         return rentalMapper.toDto(savedRental);
+    }
+
+    private Function<Rental, ? extends RentalDto> getRentalMapper(boolean isUserAdmin) {
+        return isUserAdmin
+                ? rentalMapper::toDtoForAdmin
+                : rentalMapper::toDto;
     }
 
     private void ensureRentalNotReturned(Rental rental) {
@@ -113,10 +125,14 @@ public class RentalServiceImpl implements RentalService {
     }
 
     private Rental getRentalByIdForUser(Long id, User user) {
-        return rentalRepository.findByIdAndUserId(id, user.getId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Can't find a rental by id: " + id
-                ));
+        boolean isUserAdmin = user.isAdmin();
+        Optional<Rental> optionalRental = isUserAdmin
+                ? rentalRepository.findById(id)
+                : rentalRepository.findByIdAndUserId(id, user.getId());
+
+        return optionalRental.orElseThrow(
+                () -> new EntityNotFoundException("Can't find a rental by id: " + id)
+        );
     }
 
     private void decreaseInventoryInCar(Car car) {

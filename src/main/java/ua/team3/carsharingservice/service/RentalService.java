@@ -7,9 +7,9 @@ import ua.team3.carsharingservice.dto.RentalRequestDto;
 import ua.team3.carsharingservice.model.User;
 
 public interface RentalService {
-    List<RentalDto> getAll(User user, Pageable pageable);
+    List<? extends RentalDto> getAll(User user, Pageable pageable);
 
-    RentalDto getById(Long id, User user);
+    <T extends RentalDto> T getById(Long id, User user);
 
     RentalDto create(RentalRequestDto dto, User user);
 
