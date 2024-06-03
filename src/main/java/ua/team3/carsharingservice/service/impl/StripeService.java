@@ -5,6 +5,10 @@ import static com.stripe.param.checkout.SessionCreateParams.LineItem.PriceData;
 import static com.stripe.param.checkout.SessionCreateParams.LineItem.PriceData.ProductData;
 import static com.stripe.param.checkout.SessionCreateParams.Mode;
 import static com.stripe.param.checkout.SessionCreateParams.PaymentMethodType;
+import static ua.team3.carsharingservice.util.StripeConst.CONVERSATION_RATE;
+import static ua.team3.carsharingservice.util.StripeConst.CURRENCY;
+import static ua.team3.carsharingservice.util.StripeConst.DEFAULT_QUANTITY;
+import static ua.team3.carsharingservice.util.StripeConst.SESSION_DURATION;
 
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -20,11 +24,6 @@ import ua.team3.carsharingservice.service.PaymentSystemService;
 @Service
 @RequiredArgsConstructor
 public class StripeService implements PaymentSystemService {
-    private static final Long CONVERSATION_RATE = 100L;
-    private static final Long SESSION_DURATION = 24L;
-    private static final Long DEFAULT_QUANTITY = 1L;
-    private static final String CURRENCY = "USD";
-
     public Session createPaymentSession(String productName,
                                         BigDecimal amount,
                                         String successUrl,

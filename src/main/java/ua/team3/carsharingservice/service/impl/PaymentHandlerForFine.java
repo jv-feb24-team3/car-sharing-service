@@ -1,11 +1,12 @@
 package ua.team3.carsharingservice.service.impl;
 
+import static ua.team3.carsharingservice.util.StripeConst.FINE_MULTIPLAYER;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ua.team3.carsharingservice.model.Payment;
 import ua.team3.carsharingservice.model.Rental;
@@ -14,9 +15,6 @@ import ua.team3.carsharingservice.service.PaymentHandler;
 @Component("FINE")
 @RequiredArgsConstructor
 public class PaymentHandlerForFine implements PaymentHandler {
-    @Value("${fine.multiplayer}")
-    private BigDecimal fineMultiplayer;
-
     @Override
     public long calculateDays(Rental rental) {
         return ChronoUnit.DAYS.between(rental.getReturnDate(), rental.getActualReturnDate());
@@ -24,7 +22,7 @@ public class PaymentHandlerForFine implements PaymentHandler {
 
     @Override
     public BigDecimal calculateAmount(BigDecimal dailyFee, long rentalDays) {
-        return fineMultiplayer.multiply(dailyFee).multiply(BigDecimal.valueOf(rentalDays));
+        return FINE_MULTIPLAYER.multiply(dailyFee).multiply(BigDecimal.valueOf(rentalDays));
     }
 
     @Override
