@@ -91,16 +91,16 @@ public class RentalServiceImpl implements RentalService {
     }
 
     private void validateRentalPermissionFor(User user) {
-        checkOverdueRentalsFor(user);
+        checkUnreturnedCarsFor(user);
     }
 
-    private void checkOverdueRentalsFor(User user) {
-        boolean hasOverdueRentals = rentalRepository.findByUserId(user.getId()).stream()
+    private void checkUnreturnedCarsFor(User user) {
+        boolean hasUnreturnedCars = rentalRepository.findByUserId(user.getId()).stream()
                 .anyMatch(rental -> rental.getActualReturnDate() == null
                         && rental.getReturnDate().isBefore(LocalDate.now()));
-        if (hasOverdueRentals) {
+        if (hasUnreturnedCars) {
             throw new ForbiddenRentalCreationException(
-                    "The user has overdue car rentals"
+                    "The user has unreturned cars"
             );
         }
     }

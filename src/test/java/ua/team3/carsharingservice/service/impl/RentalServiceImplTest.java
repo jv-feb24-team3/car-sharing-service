@@ -117,38 +117,54 @@ class RentalServiceImplTest {
     }
 
     @Test
+    @DisplayName("Create new rental with past rental date")
     void createRental_invalidRentalDate_exception() {
         rentalRequestDto.setRentalDate(LocalDate.now().minusDays(1));
 
-        assertThrows(NotValidRentalDateException.class, () -> {
-            rentalService.create(rentalRequestDto, user);
-        });
+        NotValidRentalDateException exception = assertThrows(
+                NotValidRentalDateException.class,
+                () -> {
+                    rentalService.create(rentalRequestDto, user);
+            });
+        assertEquals("Rental date can't be in past", exception.getMessage());
     }
 
     @Test
+    @DisplayName("Create new rental with return date before rental date")
     void createRental_invalidReturnDate_exception() {
         rentalRequestDto.setReturnDate(LocalDate.now().minusDays(1));
 
-        assertThrows(NotValidReturnDateException.class, () -> {
-            rentalService.create(rentalRequestDto, user);
-        });
+        NotValidReturnDateException exception = assertThrows(
+                NotValidReturnDateException.class,
+                () -> {
+                    rentalService.create(rentalRequestDto, user);
+            });
+        assertEquals("Return date should be after rental date", exception.getMessage());
     }
 
     @Test
+    @DisplayName("Create new rental with no cars available")
     void createRental_noCarsAvailable_exception() {
         car.setInventory(0);
         when(carRepository.findById(anyLong())).thenReturn(Optional.of(car));
 
-        assertThrows(NoCarsAvailableException.class, () -> {
-            rentalService.create(rentalRequestDto, user);
-        });
+        NoCarsAvailableException exception = assertThrows(
+                NoCarsAvailableException.class,
+                () -> {
+                    rentalService.create(rentalRequestDto, user);
+            });
+        assertEquals(
+                "There are no available cars of this type, please choose another",
+                exception.getMessage()
+        );
 
         verify(carRepository).findById(rentalRequestDto.getCarId());
         verify(rentalRepository, never()).save(any(Rental.class));
     }
 
     @Test
-    void createRental_overdueRentals_exception() {
+    @DisplayName("Create new rental having unreturned cars")
+    void createRental_unreturnedCars_exception() {
         Rental overdueRental = new Rental();
         overdueRental.setUser(user);
         overdueRental.setRentalDate(LocalDate.now().minusDays(10));
@@ -157,16 +173,21 @@ class RentalServiceImplTest {
 
         when(rentalRepository.findByUserId(user.getId())).thenReturn(List.of(overdueRental));
 
-        assertThrows(ForbiddenRentalCreationException.class, () -> {
-            rentalService.create(rentalRequestDto, user);
-        });
+        ForbiddenRentalCreationException exception = assertThrows(
+                ForbiddenRentalCreationException.class,
+                () -> {
+                    rentalService.create(rentalRequestDto, user);
+            });
+        assertEquals("The user has unreturned cars", exception.getMessage());
 
         verify(rentalRepository).findByUserId(user.getId());
     }
 
     @Test
+    @DisplayName("Return rental with valid values")
     void returnRental_validData_success() {
         rental.setActualReturnDate(null);
+        rentalDto.setActualReturnDate(LocalDate.now());
 
         when(rentalRepository.findByIdAndUserId(anyLong(), anyLong()))
                 .thenReturn(Optional.of(rental));
@@ -176,6 +197,7 @@ class RentalServiceImplTest {
         RentalDto result = rentalService.returnRental(RENTAL_ID, user);
 
         assertNotNull(result);
+        assertNotNull(result.getActualReturnDate());
         assertEquals(rentalDto.getId(), result.getId());
         assertEquals(CAR_INVENTORY + 1, car.getInventory());
         verify(rentalRepository).findByIdAndUserId(RENTAL_ID, user.getId());
@@ -183,18 +205,24 @@ class RentalServiceImplTest {
     }
 
     @Test
+    @DisplayName("Return already returned rental")
     void returnRental_AlreadyReturned_exception() {
         rental.setActualReturnDate(LocalDate.now());
 
         when(rentalRepository.findByIdAndUserId(anyLong(), anyLong()))
                 .thenReturn(Optional.of(rental));
 
-        assertThrows(RentalAlreadyReturnedException.class, () -> {
-            rentalService.returnRental(RENTAL_ID, user);
-        });
+        RentalAlreadyReturnedException exception = assertThrows(
+                RentalAlreadyReturnedException.class,
+                () -> {
+                    rentalService.returnRental(RENTAL_ID, user);
+            });
+        assertEquals("The rental with ID: " + RENTAL_ID + " has already been returned",
+                exception.getMessage());
     }
 
     @Test
+    @DisplayName("Get all rentals")
     void getAllRentals_validData_success() {
         Pageable pageable = PageRequest.of(0, 10);
         when(rentalRepository.findByUserId(anyLong(), any(Pageable.class)))
@@ -209,6 +237,7 @@ class RentalServiceImplTest {
     }
 
     @Test
+    @DisplayName("Get rental by ID with valid values")
     void getRentalById_validData_success() {
         when(rentalRepository.findByIdAndUserId(anyLong(), anyLong()))
                 .thenReturn(Optional.of(rental));
@@ -222,11 +251,15 @@ class RentalServiceImplTest {
     }
 
     @Test
+    @DisplayName("Get a rental with a non-existent ID")
     void getRentalById_NotFound_exception() {
         when(rentalRepository.findByIdAndUserId(anyLong(), anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> {
-            rentalService.getById(RENTAL_ID, user);
-        });
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> {
+                    rentalService.getById(RENTAL_ID, user);
+            });
+        assertEquals("Can't find a rental by id: " + RENTAL_ID, exception.getMessage());
     }
 }
