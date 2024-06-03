@@ -15,7 +15,7 @@ import ua.team3.carsharingservice.service.PaymentHandler;
 @RequiredArgsConstructor
 public class PaymentHandlerForFine implements PaymentHandler {
     @Value("${fine.multiplayer}")
-    private BigDecimal FINE_MULTIPLAYER;
+    private BigDecimal fineMultiplayer;
 
     @Override
     public long calculateDays(Rental rental) {
@@ -24,7 +24,7 @@ public class PaymentHandlerForFine implements PaymentHandler {
 
     @Override
     public BigDecimal calculateAmount(BigDecimal dailyFee, long rentalDays) {
-        return FINE_MULTIPLAYER.multiply(dailyFee).multiply(BigDecimal.valueOf(rentalDays));
+        return fineMultiplayer.multiply(dailyFee).multiply(BigDecimal.valueOf(rentalDays));
     }
 
     @Override

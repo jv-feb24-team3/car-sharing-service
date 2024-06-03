@@ -10,7 +10,7 @@ import ua.team3.carsharingservice.service.PaymentHandler;
 public class PaymentHandlerFactory {
     private final Map<String, PaymentHandler> handlerMap;
 
-    public PaymentHandler getHandler (String paymentType) {
+    public PaymentHandler getHandler(String paymentType) {
         return handlerMap.get(paymentType);
     }
 }

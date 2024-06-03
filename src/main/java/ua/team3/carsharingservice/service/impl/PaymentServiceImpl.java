@@ -46,7 +46,7 @@ public class PaymentServiceImpl implements PaymentService {
         String type = createDto.getPaymentType().toUpperCase();
         PaymentHandler paymentHandler = handlerFactory.getHandler(type);
         if (paymentHandler == null) {
-                throw new InvalidPaymentTypeException("Payment type "
+            throw new InvalidPaymentTypeException("Payment type "
                         + createDto.getPaymentType() + " doesn't exist");
         }
         Type paymentType = getPaymentType(type);

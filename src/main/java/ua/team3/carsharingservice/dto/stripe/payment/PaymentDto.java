@@ -2,7 +2,7 @@ package ua.team3.carsharingservice.dto.stripe.payment;
 
 import java.math.BigDecimal;
 
-public record PaymentDto (
+public record PaymentDto(
         Long id,
         String status,
         String type,
@@ -10,5 +10,5 @@ public record PaymentDto (
         String sessionUrl,
         String sessionId,
         BigDecimal amount
-        ) {
+) {
 }
