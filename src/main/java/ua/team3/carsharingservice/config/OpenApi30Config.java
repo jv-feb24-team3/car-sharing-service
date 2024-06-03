@@ -30,10 +30,12 @@ public class OpenApi30Config {
 
     @Bean
     public OpenAPI customOpenApi() {
-        PathItem pathItem = new PathItem();
+        PathItem pathItemForPost = new PathItem();
+        PathItem pathItemForGet = new PathItem();
         Operation operation = new Operation();
         operation.setSecurity(new ArrayList<>());
-        pathItem.post(operation);
+        pathItemForPost.post(operation);
+        pathItemForGet.get(operation);
 
         return new OpenAPI()
                 .components(new Components().addSecuritySchemes(BEARER_AUTH,
@@ -43,8 +45,11 @@ public class OpenApi30Config {
                                 .bearerFormat(JWT)))
                 .info(new Info().title(apiTitle).version(apiVersion))
                 .addSecurityItem(new SecurityRequirement().addList(BEARER_AUTH))
-                .path("/auth/register", pathItem)
-                .path("/auth/login", pathItem)
-                .path("/cars", pathItem);
+                .path("/auth/registration", pathItemForPost)
+                .path("/auth/login", pathItemForPost)
+                .path("/cars", pathItemForGet)
+                .path("/cars/{carId}", pathItemForGet)
+                .path("/payments/success", pathItemForGet)
+                .path("/payments/cancel", pathItemForGet);
     }
 }
