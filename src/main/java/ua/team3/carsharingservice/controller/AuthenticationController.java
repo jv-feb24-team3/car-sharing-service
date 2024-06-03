@@ -1,5 +1,10 @@
 package ua.team3.carsharingservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,19 +22,39 @@ import ua.team3.carsharingservice.service.UserService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/auth")
+@Tag(name = "Authentication",
+        description = "Operations related to user authentication and registration")
 public class AuthenticationController {
     private final UserService userService;
     private final AuthenticationService authenticationService;
 
     @PostMapping("/registration")
+    @Operation(summary = "Register a new user",
+            description = "Register a new user by providing registration details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User registered successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "409", description = "User already exists"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public UserResponseDto register(
+            @Parameter(description = "User registration request details")
             @Valid @RequestBody UserRegistrationRequestDto requestDto
     ) throws RegistrationException {
         return userService.save(requestDto);
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Login a user",
+            description = "Authenticate a user by providing login details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User authenticated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "401", description = "Authentication failed"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public UserLoginResponseDto login(
+            @Parameter(description = "User login request details")
             @Valid @RequestBody UserLoginRequestDto requestDto
     ) {
         return authenticationService.authenticate(requestDto);
