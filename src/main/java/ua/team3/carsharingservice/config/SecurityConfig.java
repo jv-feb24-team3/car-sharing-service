@@ -2,6 +2,7 @@ package ua.team3.carsharingservice.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import jakarta.ws.rs.HttpMethod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,10 +39,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers("/auth/**",
+                                        "/payments/success",
+                                        "/payments/cancel",
                                         "/v3/api-docs/**",
                                         "/swagger-ui/**",
-                                        "/error",
-                                        "/cars/**")
+                                        "/error")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.GET, "/cars/**")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
