@@ -100,7 +100,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<PaymentDto> getAllPayments(User user, Pageable pageable) {
-        return user.isAdmin() ? getAllPayments(pageable) : getAllPaymentsByUser(user, pageable);
+        return user.isAdmin() ? getAllPaymentsForAdmin(pageable) : getAllPaymentsByUser(user, pageable);
     }
 
     @Override
@@ -137,7 +137,7 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
     }
 
-    private List<PaymentDto> getAllPayments(Pageable pageable) {
+    private List<PaymentDto> getAllPaymentsForAdmin(Pageable pageable) {
         return paymentRepository.findAll(pageable)
                 .stream()
                 .map(paymentMapper::toDto)
