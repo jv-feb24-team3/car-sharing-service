@@ -3,11 +3,9 @@ package ua.team3.carsharingservice.service.impl;
 import static ua.team3.carsharingservice.util.StripeConst.FINE_MULTIPLAYER;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ua.team3.carsharingservice.model.Payment;
 import ua.team3.carsharingservice.model.Rental;
 import ua.team3.carsharingservice.service.PaymentHandler;
 
@@ -22,15 +20,5 @@ public class PaymentHandlerForFine implements PaymentHandler {
     @Override
     public BigDecimal calculateAmount(BigDecimal dailyFee, long rentalDays) {
         return FINE_MULTIPLAYER.multiply(dailyFee).multiply(BigDecimal.valueOf(rentalDays));
-    }
-
-    @Override
-    public boolean canCreateSession(Rental rental, Payment payment) {
-        if (payment.getSessionId() != null) {
-            return false;
-        }
-        LocalDate actualReturnDate = rental.getActualReturnDate();
-        LocalDate returnDate = rental.getReturnDate();
-        return actualReturnDate != null && actualReturnDate.isAfter(returnDate);
     }
 }
