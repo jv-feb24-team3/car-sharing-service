@@ -33,8 +33,7 @@ public class RentalController {
     @Operation(
             summary = "Return list of rentals",
             description = "Returns a paginated list of rentals for the authenticated user. "
-                    + "If the user is an admin, returns all rentals.",
-            security = @SecurityRequirement(name = "bearerAuth")
+                    + "If the user is an admin, returns all rentals."
     )
     @GetMapping
     public List<RentalDto> getAll(@AuthenticationPrincipal User user, Pageable pageable) {
@@ -43,8 +42,8 @@ public class RentalController {
 
     @Operation(
             summary = "Return rental by id",
-            description = "Returns details of rental by its id for the authenticated user",
-            security = @SecurityRequirement(name = "bearerAuth")
+            description = "Returns details of rental by its id for the authenticated user. "
+                    + "Admins can view any rental."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
@@ -59,8 +58,7 @@ public class RentalController {
 
     @Operation(
             summary = "Create new rental",
-            description = "Creates a new rental for the authenticated user",
-            security = @SecurityRequirement(name = "bearerAuth")
+            description = "Creates a new rental for the authenticated user"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Rental created successfully",
@@ -79,8 +77,7 @@ public class RentalController {
     @Operation(
             summary = "Close rental by id",
             description = "Closes the rental by its id for the authenticated user "
-                    + "by setting the actual return date",
-            security = @SecurityRequirement(name = "bearerAuth")
+                    + "by setting the actual return date"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Rental closed successfully",
