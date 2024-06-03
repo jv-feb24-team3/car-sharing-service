@@ -8,12 +8,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ua.team3.carsharingservice.dto.UserResponseDto;
 import ua.team3.carsharingservice.dto.UserRoleUpdateDto;
 import ua.team3.carsharingservice.dto.UserUpdateRequestDto;
-import ua.team3.carsharingservice.model.Role;
 import ua.team3.carsharingservice.service.UserService;
 
 @RestController
