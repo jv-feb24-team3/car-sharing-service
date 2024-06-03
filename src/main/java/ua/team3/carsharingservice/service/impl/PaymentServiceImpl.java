@@ -75,11 +75,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<PaymentDto> getPaymentsByUserId(Long userId, Pageable pageable) {
-        List<Payment> paymentList = paymentRepository.findPaymentsByUserId(userId, pageable);
-        if (paymentList.isEmpty()) {
-            throw new EntityNotFoundException("User with id " + userId + "payment history is empty");
-        }
-        return paymentList.stream()
+        return paymentRepository.findPaymentsByUserId(userId, pageable)
+                .stream()
                 .map(paymentMapper::toDto)
                 .toList();
     }

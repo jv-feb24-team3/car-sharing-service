@@ -143,10 +143,6 @@ public class RentalServiceImpl implements RentalService {
         );
     }
 
-    private boolean isRentOverdue(Rental rental) {
-        return rental.getActualReturnDate() == null
-                && rental.getReturnDate().isBefore(LocalDate.now());
-    }
 
     private void decreaseInventoryInCar(Car car) {
         int availableCarInventory = car.getInventory();
