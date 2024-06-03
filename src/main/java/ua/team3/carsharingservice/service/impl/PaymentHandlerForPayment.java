@@ -2,7 +2,6 @@ package ua.team3.carsharingservice.service.impl;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ua.team3.carsharingservice.model.Payment;
@@ -24,7 +23,9 @@ public class PaymentHandlerForPayment implements PaymentHandler {
     }
 
     @Override
-    public boolean canMakePayment(Rental rental, Optional<Payment> optionalPayment) {
-        return optionalPayment.isEmpty();
+    public boolean canCreateSession(Rental rental, Payment payment) {
+        return payment == null
+                || payment.getSessionId() == null
+                || payment.getStatus() != Payment.Status.PAID;
     }
 }

@@ -56,8 +56,8 @@ public class PaymentServiceImpl implements PaymentService {
                 () -> new EntityNotFoundException("rental with id: "
                         + createDto.getRentalId() + " doesn't exist")
         );
-        if (!paymentHandler.canMakePayment(rental, optionalPayment)) {
-            throw new StripeSessionException("Can't create payment for rental with id "
+        if (!paymentHandler.canCreateSession(rental, optionalPayment.get())) {
+            throw new StripeSessionException("Can't create session for payment with rental id "
                     + rental.getId());
         }
         Car car = rental.getCar();
@@ -68,7 +68,7 @@ public class PaymentServiceImpl implements PaymentService {
         Session session =
                 paymentSystemService.createPaymentSession(car.getBrand(), amount, successUrl,
                         cancelUrl);
-        formAndSavePayment(paymentType, rental, amount, session);
+        createPayment(paymentType, rental);
         return new PaymentResponseUrlDto(session.getUrl());
     }
 
@@ -102,17 +102,22 @@ public class PaymentServiceImpl implements PaymentService {
         return STATUS_PAID.equals(session.getPaymentStatus());
     }
 
-    private void formAndSavePayment(Type paymentType,
-                                    Rental rental,
-                                    BigDecimal amountToPay,
-                                    Session session) {
+    @Override
+    public void createPayment(Type paymentType,
+                               Rental rental) {
         Payment payment = new Payment();
         payment.setType(paymentType);
         payment.setRental(rental);
-        payment.setAmount(amountToPay);
         payment.setStatus(PENDING);
+        paymentRepository.save(payment);
+    }
+
+    private void setSessionToPayment(Payment payment,
+                                     BigDecimal amountToPay,
+                                     Session session) {
         payment.setSessionId(session.getId());
         payment.setSessionUrl(session.getUrl());
+        payment.setAmount(amountToPay);
         paymentRepository.save(payment);
     }
 

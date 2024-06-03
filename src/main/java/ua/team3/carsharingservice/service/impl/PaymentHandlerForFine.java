@@ -5,7 +5,6 @@ import static ua.team3.carsharingservice.util.StripeConst.FINE_MULTIPLAYER;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ua.team3.carsharingservice.model.Payment;
@@ -26,8 +25,8 @@ public class PaymentHandlerForFine implements PaymentHandler {
     }
 
     @Override
-    public boolean canMakePayment(Rental rental, Optional<Payment> optionalPayment) {
-        if (optionalPayment.isPresent()) {
+    public boolean canCreateSession(Rental rental, Payment payment) {
+        if (payment.getSessionId() != null) {
             return false;
         }
         LocalDate actualReturnDate = rental.getActualReturnDate();

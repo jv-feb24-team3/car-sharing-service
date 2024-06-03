@@ -1,5 +1,8 @@
 package ua.team3.carsharingservice.service.impl;
 
+import static ua.team3.carsharingservice.model.Payment.Type.FINE;
+import static ua.team3.carsharingservice.model.Payment.Type.PAYMENT;
+
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
@@ -22,6 +25,7 @@ import ua.team3.carsharingservice.model.Rental;
 import ua.team3.carsharingservice.model.User;
 import ua.team3.carsharingservice.repository.CarRepository;
 import ua.team3.carsharingservice.repository.RentalRepository;
+import ua.team3.carsharingservice.service.PaymentService;
 import ua.team3.carsharingservice.service.RentalService;
 import ua.team3.carsharingservice.telegram.service.NotificationService;
 
@@ -34,6 +38,7 @@ public class RentalServiceImpl implements RentalService {
     private final CarRepository carRepository;
     private final RentalMapper rentalMapper;
     private final NotificationService notificationService;
+    private final PaymentService paymentService;
 
     @Override
     public List<? extends RentalDto> getAll(User user, Pageable pageable) {
@@ -66,6 +71,7 @@ public class RentalServiceImpl implements RentalService {
         rental.setUser(user);
         rental.setCar(car);
         Rental savedRental = rentalRepository.save(rental);
+        paymentService.createPayment(PAYMENT, savedRental);
         notificationService.sendRentalCreatedNotification(savedRental);
         return rentalMapper.toDto(savedRental);
     }
@@ -79,6 +85,9 @@ public class RentalServiceImpl implements RentalService {
         rental.setActualReturnDate(LocalDate.now());
         rental.getCar().setInventory(rental.getCar().getInventory() + DEFAULT_CAR_COUNT);
         Rental savedRental = rentalRepository.save(rental);
+        if (isRentOverdue(savedRental)) {
+            paymentService.createPayment(FINE, savedRental);
+        }
         return rentalMapper.toDto(savedRental);
     }
 
