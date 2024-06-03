@@ -5,7 +5,6 @@ import ua.team3.carsharingservice.dto.UserResponseDto;
 import ua.team3.carsharingservice.dto.UserRoleUpdateDto;
 import ua.team3.carsharingservice.dto.UserUpdateRequestDto;
 import ua.team3.carsharingservice.exception.RegistrationException;
-import ua.team3.carsharingservice.model.Role;
 
 public interface UserService {
     UserResponseDto save(UserRegistrationRequestDto requestDto) throws RegistrationException;
