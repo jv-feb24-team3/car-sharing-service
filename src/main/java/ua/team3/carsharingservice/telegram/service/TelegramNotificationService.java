@@ -30,11 +30,11 @@ public class TelegramNotificationService implements NotificationService {
 
     @Override
     public void sendOverdueRentalsNotification(Rental rental) {
-        SendMessage message = new SendMessage();
-        message.setChatId(telegramBot.getAdminChatId());
-        message.setText(buildOverdueRentalsList(rental));
+        SendMessage response = new SendMessage();
+        response.setChatId(telegramBot.getAdminChatId());
+        response.setText(buildOverdueRentalsList(rental));
         try {
-            telegramBot.execute(message);
+            telegramBot.execute(response);
         } catch (TelegramApiException e) {
             throw new NotificationSendingException("Can't send notification about rental with id "
                     + rental.getId());
