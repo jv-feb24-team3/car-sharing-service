@@ -30,6 +30,10 @@ databaseChangeLog:
                     references: rentals(id)
                     primaryKey: true
               - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
                    name: session_url
                    type: varchar(2048)
               - column:

@@ -1,11 +1,11 @@
 package ua.team3.carsharingservice.service;
 
 import com.stripe.model.checkout.Session;
-import java.math.BigDecimal;
+import ua.team3.carsharingservice.model.Payment;
 
 public interface PaymentSystemService {
-    Session createPaymentSession(String productName,
-                                 BigDecimal amount,
+    Session createPaymentSession(Payment payment,
+                                 String productName,
                                  String successUrl,
                                  String cancelUrl);
 

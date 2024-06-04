@@ -5,6 +5,8 @@ import static ua.team3.carsharingservice.model.Payment.Status.PAID;
 import static ua.team3.carsharingservice.model.Payment.Status.PENDING;
 import static ua.team3.carsharingservice.model.Payment.Type.FINE;
 import static ua.team3.carsharingservice.model.Payment.Type.PAYMENT;
+import static ua.team3.carsharingservice.model.Rental.Status.CANCELLED;
+import static ua.team3.carsharingservice.model.Rental.Status.OVERDUE;
 import static ua.team3.carsharingservice.util.StripeConst.CANCELING_MESSAGE;
 import static ua.team3.carsharingservice.util.StripeConst.CANCEL_ENDPOINT;
 import static ua.team3.carsharingservice.util.StripeConst.SESSION_ID_PARAM;
@@ -16,12 +18,16 @@ import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.team3.carsharingservice.dto.stripe.payment.PaymentDto;
 import ua.team3.carsharingservice.dto.stripe.payment.PaymentResponseUrlDto;
@@ -66,11 +72,16 @@ public class PaymentServiceImpl implements PaymentService {
         String successUrl = buildSuccessUrl();
         String cancelUrl = buildCancelUrl();
         Payment payment = optionalPayment.get();
+        if (FINE.equals(payment.getType())) {
+            payment = createPayment(FINE, rental);
+        }
         Session session =
-                paymentSystemService.createPaymentSession(car.getBrand(),
-                        payment.getAmount(),
+                paymentSystemService.createPaymentSession(
+                        payment,
+                        car.getBrand(),
                         successUrl,
-                        cancelUrl);
+                        cancelUrl
+                );
         setSessionToPayment(payment, session);
         return new PaymentResponseUrlDto(session.getUrl());
     }
@@ -127,19 +138,42 @@ public class PaymentServiceImpl implements PaymentService {
         if (actualReturnDate != null
                 && returnDate.isBefore(actualReturnDate)) {
             createPayment(FINE, rental);
+            rental.setStatus(OVERDUE);
         }
+    }
+
+    @Transactional
+    @Scheduled(timeUnit = TimeUnit.MINUTES, fixedRate = 15)
+    public void updateExpiredPayments() {
+        LocalDateTime timeLimit = LocalDateTime.now().minusHours(24);
+        List<Payment> expiredPayments =
+                paymentRepository.findPendingPaymentsOlderThan(timeLimit);
+        expiredPayments.forEach(this::checkAndUpdateRentalStatus);
+        paymentRepository.saveAll(expiredPayments);
+    }
+
+    private void checkAndUpdateRentalStatus(Payment payment) {
+        Rental rental = payment.getRental();
+        payment.setStatus(EXPIRED);
+        if (rental.getStatus() != OVERDUE) {
+            rental.setStatus(CANCELLED);
+            rentalRepository.save(rental);
+        }
+        paymentRepository.save(payment);
     }
 
     private Payment updatePaymentStatus(String sessionId, Payment.Status status) {
         Session session = paymentSystemService.getSession(sessionId);
         Payment payment = paymentRepository.findBySessionId(session.getId()).orElseThrow(
-                () -> new EntityNotFoundException("Can`t find payment with session id " + sessionId)
+                () -> new EntityNotFoundException(
+                        "Can`t find payment with session id " + sessionId
+                )
         );
         payment.setStatus(status);
         return paymentRepository.save(payment);
     }
 
-    private void createPayment(Type paymentType, Rental rental) {
+    private Payment createPayment(Type paymentType, Rental rental) {
         Payment payment = new Payment();
         payment.setRental(rental);
         payment.setType(paymentType);
@@ -149,7 +183,7 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal amount =
                 paymentHandler.calculateAmount(rental.getCar().getDailyFee(), rentalDays);
         payment.setAmount(amount);
-        paymentRepository.save(payment);
+        return paymentRepository.save(payment);
     }
 
     private List<PaymentDto> getAllPaymentsForAdmin(Pageable pageable) {
