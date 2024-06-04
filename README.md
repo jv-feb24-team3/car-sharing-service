@@ -132,12 +132,92 @@ ease of use, and support for complex queries and transactions.
 2. **Set up Environments Variables**
    - Create a .env file in the root directory of the project.
    - Add the necessary environment variables. Use the provided .env.sample as a template.
+   
+   `Example .env file:`
    ```.env
-   DB_URL=jdbc:mysql://localhost:3306/car_sharing_db
-   DB_USERNAME=your_user_name
-   DB_PASSWORD=your_password
-   JWT_SECRET=your_jwt_secret
-   STRIPE_SECRET_KEY=your_stripe_secret_key
-   TELEGRAM_BOT_TOKEN=your_telegram_bot_token
-   TELEGRAM_CHAT_ID=your_telegram_chat_id
+    #MySQL Database Configuration:
+     MYSQLDB_DATABASE=test
+     MYSQLDB_USERNAME=your_user_name
+     MYSQLDB_PASSWORD=_your_password
+     MYSQLDB_ROOT_PASSWORD=your_password
+     MYSQLDB_LOCAL_PORT=3308
+     MYSQLDB_PORT=3306
+
+   # Spring Boot Configuration
+     SPRING_LOCAL_PORT=8082
+     SPRING_DOCKER_PORT=8080
+
+   # Debug Port
+     DEBUG_PORT=5006
+
+   # Telegram Bot Configuration
+     BOT_USERNAME=your_telegram_user_name
+     BOT_TOKEN=your_telegram_bot_token
+
+   # Stripe API Configuration
+     STRIPE_API_KEY=your_key
+
+   # JWT Configuration
+     JWT_SECRET=your_secret
+     JWT_EXPIRATION=your_expiration
    ```
+3. **Build the Project**
+   ```bash
+   mvn clean install
+   ```
+4. **Run the Application**
+   - **Using Docker Compose**
+   ```bash
+   docker-compose up --build
+   ```
+   - **Using Maven**
+   ```bash
+   mvn spring-boot:run
+   ```
+5. **Access the Application**
+   - The application should now be running on http://localhost:8082.
+   - You can access the Swagger API documentation at http://localhost:8082/swagger-ui.html.
+### Optional: Running Tests 
+**To run the tests, use the following Maven command**:
+   ```bash
+   mvn test
+   ```
+## Challenges and Solutions
+During the development of the Car Sharing Service, 
+several challenges were encountered. Here are some of the key 
+challenges and the solutions implemented to overcome them:
+1. ### Secure Authentication and Authorization
+    **Challenge**: Implementing a secure authentication system 
+that handles user registration, login, and role-based 
+access control while ensuring sensitive user data is protected. 
+
+    **Solution**:
+    - **JWT Tokens**: We used JWT (JSON Web Tokens) for secure authentication and session management. JWT allows for stateless authentication, making it scalable and efficient.
+    - **Spring Security**: Integrated Spring Security to handle authentication and authorization, ensuring that only authorized users can access certain endpoints.
+    - **Password Encryption**: Utilized strong hashing algorithms (e.g., BCrypt) to store passwords securely, ensuring user credentials are protected.
+2. ### Database Schema Management
+   **Challenge**: Managing and applying database schema changes consistently across different environments.
+   
+   **Solution**:
+   - **Liquibase**: Integrated Liquibase for database migrations, allowing us to track, version, and deploy database schema changes systematically. This ensures that all environments (development, testing, production) are in sync with the latest database structure.
+3. ### Payment Integration
+   **Challenge**: Integrating with Stripe API to handle payments securely and efficiently.
+
+   **Solution**:
+   - **Stripe API**: Used Stripe API for creating payment sessions, handling transactions, and managing payment statuses.
+   - **Payment Status Handling**: Implemented endpoints to handle payment success and cancellation, ensuring users are informed of the payment status and can take appropriate actions.
+4. ### Real-time Notifications
+   **Challenge**: Implementing a real-time notification system to inform administrators about new rentals, overdue rentals, and successful payments.
+
+   **Solution**:
+   - **Telegram API**: Integrated with Telegram API to send real-time notifications to administrators. A Telegram bot was set up to handle the notifications.
+5. ### Containerization and Deployment
+   **Challenge**: Ensuring the application is easy to deploy and run in different environments.
+   
+   **Solution**: 
+   - **Docker**: Containerized the application using Docker, allowing it to run consistently across different environments.
+   - **Docker Compose**: Used Docker Compose to manage multi-container setups, making it easy to set up the application along with its dependencies (e.g., MySQL) with a single command.
+6. ### API Documentation
+   **Challenge**: Providing clear and comprehensive API documentation for developers and users to interact with the service.
+   
+   **Solution**: Swagger/OpenAPI: Integrated Swagger for API documentation, providing an interactive interface for exploring and testing API endpoints. This improves developer experience and ensures clarity in how the API can be used.
