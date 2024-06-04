@@ -31,7 +31,6 @@ import ua.team3.carsharingservice.exception.ForbiddenRentalCreationException;
 import ua.team3.carsharingservice.exception.NoCarsAvailableException;
 import ua.team3.carsharingservice.exception.NotValidRentalDateException;
 import ua.team3.carsharingservice.exception.NotValidReturnDateException;
-import ua.team3.carsharingservice.exception.RentalAlreadyReturnedException;
 import ua.team3.carsharingservice.exception.RentalCantBeReturnedException;
 import ua.team3.carsharingservice.mapper.RentalMapper;
 import ua.team3.carsharingservice.model.Car;
