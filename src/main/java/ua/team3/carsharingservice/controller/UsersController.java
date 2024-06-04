@@ -29,12 +29,6 @@ public class UsersController {
     @PutMapping("/role")
     @Operation(summary = "Update user role",
             description = "Allows an admin to update the role of a user")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Role updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "403", description = "Access forbidden"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
     public void updateUserRole(
             @Parameter(description = "User role update request")
             @Valid @RequestBody UserRoleUpdateDto updateDto) {
@@ -45,11 +39,6 @@ public class UsersController {
     @GetMapping("/me")
     @Operation(summary = "Get current user's profile",
             description = "Retrieve the profile information of the currently authenticated user")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Profile retrieved successfully"),
-            @ApiResponse(responseCode = "403", description = "Access forbidden"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
     public UserResponseDto getMyProfile() {
         return userService.getCurrentUserProfile();
     }
@@ -58,12 +47,6 @@ public class UsersController {
     @PutMapping("/me")
     @Operation(summary = "Update current user's profile",
             description = "Update the profile information of the currently authenticated user")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Profile updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "403", description = "Access forbidden"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
     public UserResponseDto updateMyProfile(
             @Parameter(description = "User profile update request")
             @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto

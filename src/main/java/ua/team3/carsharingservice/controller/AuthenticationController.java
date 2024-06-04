@@ -31,12 +31,6 @@ public class AuthenticationController {
     @PostMapping("/registration")
     @Operation(summary = "Register a new user",
             description = "Register a new user by providing registration details")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User registered successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "409", description = "User already exists"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
     public UserResponseDto register(
             @Parameter(description = "User registration request details")
             @Valid @RequestBody UserRegistrationRequestDto requestDto
@@ -47,12 +41,6 @@ public class AuthenticationController {
     @PostMapping("/login")
     @Operation(summary = "Login a user",
             description = "Authenticate a user by providing login details")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User authenticated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "401", description = "Authentication failed"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
     public UserLoginResponseDto login(
             @Parameter(description = "User login request details")
             @Valid @RequestBody UserLoginRequestDto requestDto
