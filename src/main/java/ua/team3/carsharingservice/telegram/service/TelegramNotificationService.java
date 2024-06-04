@@ -8,12 +8,14 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ua.team3.carsharingservice.exception.NotificationSendingException;
 import ua.team3.carsharingservice.model.Payment;
 import ua.team3.carsharingservice.model.Rental;
+import ua.team3.carsharingservice.repository.PaymentRepository;
 import ua.team3.carsharingservice.telegram.TelegramBot;
 
 @Service
 @RequiredArgsConstructor
 public class TelegramNotificationService implements NotificationService {
     private final TelegramBot telegramBot;
+    private final PaymentRepository paymentRepository;
 
     @Override
     public void sendRentalCreatedNotification(Rental rental) {
@@ -55,6 +57,7 @@ public class TelegramNotificationService implements NotificationService {
 
     @Override
     public void sendPaymentSuccessfulNotification(Payment payment) {
+        payment = paymentRepository.findByIdAndFetchDetailsEagerly(payment.getId()).get();
         SendMessage response = new SendMessage();
         response.setChatId(telegramBot.getAdminChatId());
         response.setText(buildPaymentSuccessfulMessage(payment));

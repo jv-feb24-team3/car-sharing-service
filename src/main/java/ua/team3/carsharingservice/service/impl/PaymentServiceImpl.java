@@ -5,7 +5,9 @@ import static ua.team3.carsharingservice.model.Payment.Status.PAID;
 import static ua.team3.carsharingservice.model.Payment.Status.PENDING;
 import static ua.team3.carsharingservice.model.Payment.Type.FINE;
 import static ua.team3.carsharingservice.model.Payment.Type.PAYMENT;
+import static ua.team3.carsharingservice.model.Rental.Status.ACTIVE;
 import static ua.team3.carsharingservice.model.Rental.Status.CANCELLED;
+import static ua.team3.carsharingservice.model.Rental.Status.COMPLETED;
 import static ua.team3.carsharingservice.model.Rental.Status.OVERDUE;
 import static ua.team3.carsharingservice.util.StripeConst.CANCELING_MESSAGE;
 import static ua.team3.carsharingservice.util.StripeConst.CANCEL_ENDPOINT;
@@ -73,7 +75,10 @@ public class PaymentServiceImpl implements PaymentService {
         }
         Payment payment = optionalPayment.get();
         if (EXPIRED.equals(payment.getStatus())) {
-            handleExpiredPayment(payment, rental);
+            payment = handleExpiredPayment(payment, rental);
+        } else if (PAID.equals(payment.getStatus())) {
+            throw new PaymentProcessedException(
+                    "This payment is already paid");
         }
         Car car = rental.getCar();
         String successUrl = buildSuccessUrl();
@@ -100,6 +105,12 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public void handlePaymentSuccess(String sessionId) {
         Payment payment = updatePaymentStatus(sessionId, PAID);
+        if (PAYMENT.equals(payment.getType())) {
+            payment.getRental().setStatus(ACTIVE);
+        } else if (FINE.equals(payment.getType())) {
+            payment.getRental().setStatus(COMPLETED);
+            rentalRepository.save(payment.getRental());
+        }
         notificationService.sendPaymentSuccessfulNotification(payment);
     }
 
@@ -143,6 +154,7 @@ public class PaymentServiceImpl implements PaymentService {
                 && returnDate.isBefore(actualReturnDate)) {
             createPayment(FINE, rental);
             rental.setStatus(OVERDUE);
+            rentalRepository.save(rental);
         }
     }
 
@@ -156,10 +168,10 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.saveAll(expiredPayments);
     }
 
-    private void handleExpiredPayment(Payment payment, Rental rental) {
+    private Payment handleExpiredPayment(Payment payment, Rental rental) {
         if (payment.getType().equals(FINE)) {
-            createPayment(FINE, rental);
-        } else if (payment.getType().equals(PAYMENT)) {
+            return createPayment(FINE, rental);
+        } else {
             throw new PaymentProcessedException(
                     "Unfortunately, the rental with id " + rental.getId() + " was canceled. "
                             + "You can create a new one to reserve a car for yourself again");
