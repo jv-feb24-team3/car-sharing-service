@@ -28,6 +28,7 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
 
     @Query(value = "SELECT * FROM rentals r "
             + "WHERE r.return_date <= DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY) "
-            + "AND r.actual_return_date IS NULL", nativeQuery = true)
+            + "AND r.actual_return_date IS NULL AND status NOT LIKE 'CANCELLED'",
+               nativeQuery = true)
     List<Rental> getOverdueRentals();
 }
