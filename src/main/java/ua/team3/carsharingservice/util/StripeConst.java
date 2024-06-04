@@ -16,7 +16,7 @@ public class StripeConst {
     public static final Long SESSION_DURATION = 24L;
     public static final Long DEFAULT_QUANTITY = 1L;
     public static final BigDecimal FINE_MULTIPLAYER = BigDecimal.valueOf(1.3);
-    public static final long MIN_SESSION_LIFETIME_IN_SECONDS = 1800;
+    public static final long MIN_SESSION_LIFETIME_IN_HOURS = 1;
 
     private StripeConst() {
     }
