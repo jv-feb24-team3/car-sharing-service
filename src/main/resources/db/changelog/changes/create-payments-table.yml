@@ -30,7 +30,7 @@ databaseChangeLog:
                     references: rentals(id)
                     primaryKey: true
               - column:
-                  name: creation_date
+                  name: created_at
                   type: datetime
                   defaultValueComputed: CURRENT_TIMESTAMP
               - column:

@@ -16,12 +16,16 @@ import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.team3.carsharingservice.dto.stripe.payment.PaymentDto;
 import ua.team3.carsharingservice.dto.stripe.payment.PaymentResponseUrlDto;
@@ -131,6 +135,17 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private Payment updatePaymentStatus(String sessionId, Payment.Status status) {
+    @Transactional
+    @Scheduled(timeUnit = TimeUnit.MINUTES, fixedRate = 15)
+    public void updateExpiredPayments() {
+        LocalDateTime timeLimit = LocalDateTime.now().minusHours(24);
+        List<Payment> expiredPayments =
+                paymentRepository.findPendingPaymentsOlderThan(timeLimit);
+        expiredPayments.forEach(payment -> payment.setStatus(EXPIRED));
+        paymentRepository.saveAll(expiredPayments);
+    }
+
+    private void handlePaymentStatusChanging(String sessionId, Payment.Status status) {
         Session session = paymentSystemService.getSession(sessionId);
         Payment payment = paymentRepository.findBySessionId(session.getId()).orElseThrow(
                 () -> new EntityNotFoundException("Can`t find payment with session id " + sessionId)

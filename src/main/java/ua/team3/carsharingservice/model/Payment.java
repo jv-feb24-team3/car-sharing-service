@@ -36,7 +36,8 @@ public class Payment {
     @JoinColumn(name = "rental_id")
     private Rental rental;
     @CreationTimestamp
-    private LocalDateTime creationDate;
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
     private String sessionUrl;
     private String sessionId;
     @Column(nullable = false)
