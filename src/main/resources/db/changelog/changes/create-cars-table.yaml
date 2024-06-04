@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: add-cars-table
+      id: create-cars-table
       author: Hadiuchko.Dmytro
       changes:
         - createTable:

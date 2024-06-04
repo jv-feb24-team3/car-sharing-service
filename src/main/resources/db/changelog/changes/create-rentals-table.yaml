@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: add-rentals-table
+      id: create-rentals-table
       author: omiazina
       changes:
         - createTable:
@@ -39,3 +39,13 @@ databaseChangeLog:
                     nullable: false
                     foreignKeyName: fk_rentals_user_id
                     references: users(id)
+              - column:
+                  name: status
+                  type: enum('PENDING', 'ACTIVE', 'OVERDUE', 'COMPLETED', 'CANCELLED')
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: datetime
+                  constraints:
+                    nullable: false
