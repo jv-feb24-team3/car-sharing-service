@@ -71,7 +71,6 @@ public class RentalServiceImpl implements RentalService {
         rental.setUser(user);
         rental.setCar(car);
         rental.setStatus(Rental.Status.PENDING);
-        rental.setCreatedAt(LocalDateTime.now());
         Rental savedRental = rentalRepository.save(rental);
 
         paymentService.createPaymentForRental(savedRental);
