@@ -164,7 +164,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     private Payment updatePaymentStatus(String sessionId, Payment.Status status) {        Session session = paymentSystemService.getSession(sessionId);
         Payment payment = paymentRepository.findBySessionId(session.getId()).orElseThrow(
-                () -> new EntityNotFoundException("Can`t find payment with session id " + sessionId)
+                () -> new EntityNotFoundException(
+                        "Can`t find payment with session id " + sessionId
+                )
         );
         payment.setStatus(status);
         return paymentRepository.save(payment);
