@@ -200,14 +200,15 @@ class RentalServiceImplTest {
         overdueRental.setActualReturnDate(null);
         overdueRental.setStatus(Rental.Status.PENDING);
 
-        when(rentalRepository.findByStatusIn(anyList())).thenReturn(List.of(overdueRental));
+        when(rentalRepository.findByStatusInAndUser(anyList(), any(User.class)))
+                .thenReturn(List.of(overdueRental));
 
         ForbiddenRentalCreationException exception = assertThrows(
                 ForbiddenRentalCreationException.class,
                 () -> {
                     rentalService.create(rentalRequestDto, user);
                 });
-        verify(rentalRepository).findByStatusIn(anyList());
+        verify(rentalRepository).findByStatusInAndUser(anyList(), any(User.class));
     }
 
     @Test

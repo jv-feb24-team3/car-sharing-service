@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ua.team3.carsharingservice.model.Rental;
+import ua.team3.carsharingservice.model.User;
 
 public interface RentalRepository extends JpaRepository<Rental, Long> {
     @Override
@@ -32,5 +33,5 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
                nativeQuery = true)
     List<Rental> getOverdueRentals();
 
-    List<Rental> findByStatusIn(List<Rental.Status> statuses);
+    List<Rental> findByStatusInAndUser(List<Rental.Status> statuses, User user);
 }
