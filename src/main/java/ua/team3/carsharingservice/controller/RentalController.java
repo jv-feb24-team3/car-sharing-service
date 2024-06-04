@@ -37,7 +37,7 @@ public class RentalController {
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @GetMapping
-    public List<RentalDto> getAll(@AuthenticationPrincipal User user, Pageable pageable) {
+    public List<? extends RentalDto> getAll(@AuthenticationPrincipal User user, Pageable pageable) {
         return rentalService.getAll(user, pageable);
     }
 
@@ -53,7 +53,8 @@ public class RentalController {
             @ApiResponse(responseCode = "404", description = "Rental not found")
     })
     @GetMapping("/{rentalId}")
-    public RentalDto getById(@PathVariable Long rentalId, @AuthenticationPrincipal User user) {
+    public <T extends RentalDto> T getById(@PathVariable Long rentalId,
+                                           @AuthenticationPrincipal User user) {
         return rentalService.getById(rentalId, user);
     }
 
