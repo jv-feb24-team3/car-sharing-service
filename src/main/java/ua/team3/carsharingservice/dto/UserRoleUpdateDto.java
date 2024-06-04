@@ -1,13 +1,13 @@
 package ua.team3.carsharingservice.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import ua.team3.carsharingservice.model.Role;
 
 @Data
 public class UserRoleUpdateDto {
-    @NotBlank
+    @NotNull
     private Long userId;
-    @NotBlank
+    @NotNull
     private Role.RoleName role;
 }
