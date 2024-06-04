@@ -19,7 +19,7 @@ import ua.team3.carsharingservice.exception.ForbiddenRentalCreationException;
 import ua.team3.carsharingservice.exception.NoCarsAvailableException;
 import ua.team3.carsharingservice.exception.NotValidRentalDateException;
 import ua.team3.carsharingservice.exception.NotValidReturnDateException;
-import ua.team3.carsharingservice.exception.RentalAlreadyReturnedException;
+import ua.team3.carsharingservice.exception.RentalCantBeReturnedException;
 import ua.team3.carsharingservice.mapper.RentalMapper;
 import ua.team3.carsharingservice.model.Car;
 import ua.team3.carsharingservice.model.Rental;
@@ -83,7 +83,7 @@ public class RentalServiceImpl implements RentalService {
     @Transactional
     public RentalDto returnRental(Long id, User user) {
         Rental rental = getRentalByIdForUser(id, user);
-        ensureRentalNotReturned(rental);
+        ensureRentalCanBeReturned(rental);
 
         rental.setActualReturnDate(LocalDate.now());
         rental.getCar().setInventory(rental.getCar().getInventory() + DEFAULT_CAR_COUNT);
@@ -111,9 +111,14 @@ public class RentalServiceImpl implements RentalService {
         }
     }
 
-    private void ensureRentalNotReturned(Rental rental) {
+    private void ensureRentalCanBeReturned(Rental rental) {
+        if (rental.getStatus() == Rental.Status.CANCELLED) {
+            throw new RentalCantBeReturnedException(
+                    "The rental with ID: " + rental.getId() + " was been cancelled"
+            );
+        }
         if (rental.getActualReturnDate() != null) {
-            throw new RentalAlreadyReturnedException(
+            throw new RentalCantBeReturnedException(
                     "The rental with ID: " + rental.getId() + " has already been returned"
             );
         }

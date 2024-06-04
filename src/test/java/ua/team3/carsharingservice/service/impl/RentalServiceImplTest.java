@@ -31,7 +31,7 @@ import ua.team3.carsharingservice.exception.ForbiddenRentalCreationException;
 import ua.team3.carsharingservice.exception.NoCarsAvailableException;
 import ua.team3.carsharingservice.exception.NotValidRentalDateException;
 import ua.team3.carsharingservice.exception.NotValidReturnDateException;
-import ua.team3.carsharingservice.exception.RentalAlreadyReturnedException;
+import ua.team3.carsharingservice.exception.RentalCantBeReturnedException;
 import ua.team3.carsharingservice.mapper.RentalMapper;
 import ua.team3.carsharingservice.model.Car;
 import ua.team3.carsharingservice.model.Rental;
@@ -239,8 +239,8 @@ class RentalServiceImplTest {
         when(rentalRepository.findByIdAndUserId(anyLong(), anyLong()))
                 .thenReturn(Optional.of(rental));
 
-        RentalAlreadyReturnedException exception = assertThrows(
-                RentalAlreadyReturnedException.class,
+        RentalCantBeReturnedException exception = assertThrows(
+                RentalCantBeReturnedException.class,
                 () -> {
                     rentalService.returnRental(RENTAL_ID, user);
             });
