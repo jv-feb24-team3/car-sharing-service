@@ -53,7 +53,7 @@ ease of use, and support for complex queries and transactions.
 ## Feature and functionality:
 ### User management:
 1. **Registration**: Users can register on the platform by providing their email, first name, last name, and password.
-    - [Registers a new user - demo.](images/Postman_xrr1ABMx93.gif) 
+    - [Registers a new user - demo.](https://drive.google.com/file/d/1V78I2bf0_0jdg136h_TWa6mlFnaiI3Cm/view?usp=sharing) 
     ```bash
    POST: /auth/register
    ``` 
@@ -100,14 +100,41 @@ ease of use, and support for complex queries and transactions.
    ```
 ### Rental Management:
 1. **Create Rental**: Users can rent cars,  decreasing the inventory count by 1.
+   - [Create rental - demo](https://drive.google.com/file/d/1iKxJ6BGJhFB-E2rdtG4pIwyyytV5Pmtp/view?usp=sharing)
+   ```bash
+   POST: /rentals
+   ```
 2. **View Rental**: Users can view their active and past rentals. Admins can view rentals for all users.
+   - [View rental - demo](https://drive.google.com/file/d/1jn-tGLpGG6oG4AJ9tANbmB6lK8tfNfsD/view?usp=sharing)
+   ```bash
+   GET: /rentals
+   ```
 3. **Return Rental**: Users can return rented cars, which increase the inventory count by 1.
+   - [Return rental - demo](https://drive.google.com/file/d/1UE20OYRPTPcTTl63THzrwPNc69OAA5j4/view?usp=sharing)
+   ```bash
+   POST: /return/{rentalId}
+   ```
 4. **Return Filtering**: Users can filter rentals by status (active or returned) and admins can filter rentals by user ID.
+   ```bash
+   GET: /rentals/?user_id=...&is_active=...
+   ```
 ### Payment Processing
 1. **Create Payment Sessions**: Users can create payment sessions for their rentals using the Stripe API. The system calculates the total price based on the rental duration.
+   ```bash
+   POST: /payments
+   ```
 2. **Payment Status**: Users can check the status of their payments (PENDING or PAID).
+   ```bash
+   GET: /payments/{user_id}
+   ```
 3. **Payment Types**: Supports different payment types, including regular payments for rentals and fines for overdue returns.
 4. **Payment Confirmation**: Users are redirected to appropriate endpoints upon successful or canceled payments.
+   ```bash
+   GET: /payments/success
+   ```
+   ```bash
+   GET: /payments/cancel
+   ```
 ### Notification
 1. **Rental Notifications**: Notifications about new rentals are sent to administrators via Telegram.
 2. **Overdue Rentals**: Daily notifications are sent to administrators for overdue rentals.
@@ -221,3 +248,10 @@ access control while ensuring sensitive user data is protected.
    **Challenge**: Providing clear and comprehensive API documentation for developers and users to interact with the service.
    
    **Solution**: Swagger/OpenAPI: Integrated Swagger for API documentation, providing an interactive interface for exploring and testing API endpoints. This improves developer experience and ensures clarity in how the API can be used.
+
+## Authors:
+   - [Oleksandr Farion](https://github.com/ReamFOX)
+   - [Oksana Miazina](https://github.com/oksana-miazina)
+   - [Denys Diuimov](https://github.com/Eidenn005)
+   - [Mykola Skrypalov](https://github.com/kaiiiseeel)
+   - [Dmytro Hadiuchko](https://github.com/DmytroHadiuchko)
