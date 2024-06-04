@@ -78,6 +78,11 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return getDefaultTemplate(e, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(PaymentProcessedException.class)
+    public ResponseEntity<Object> handlePaymentProcessedException(
+            PaymentProcessedException e) {
+        return getDefaultTemplate(e, HttpStatus.BAD_REQUEST);
+
     @ExceptionHandler(NotificationSendingException.class)
     public ResponseEntity<Object> handleNotificationSendingException(
             Exception e
