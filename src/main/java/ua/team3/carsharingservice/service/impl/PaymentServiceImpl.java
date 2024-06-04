@@ -73,12 +73,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
         Payment payment = optionalPayment.get();
         if (EXPIRED.equals(payment.getStatus())) {
-            if (paymentType.equals(FINE)) {
-                payment = createPayment(FINE, rental);
-            } else if (paymentType.equals(PAYMENT)) {
-                throw new PaymentProcessedException(
-                        "This payment is already expired, create a new rental");
-            }
+            handleExpiredPayment(payment, rental);
         }
         Car car = rental.getCar();
         String successUrl = buildSuccessUrl();
@@ -110,7 +105,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void handleFailed(String sessionId) {
-        Payment payment = updatePaymentStatus(sessionId, EXPIRED);
+        updatePaymentStatus(sessionId, EXPIRED);
     }
 
     @Override
@@ -159,6 +154,16 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentRepository.findPendingPaymentsOlderThan(timeLimit);
         expiredPayments.forEach(this::checkAndUpdateRentalStatus);
         paymentRepository.saveAll(expiredPayments);
+    }
+
+    private void handleExpiredPayment(Payment payment, Rental rental) {
+        if (payment.getType().equals(FINE)) {
+            createPayment(FINE, rental);
+        } else if (payment.getType().equals(PAYMENT)) {
+            throw new PaymentProcessedException(
+                    "Unfortunately, the rental was canceled. "
+                            + "You can create a new one to reserve a car for yourself again");
+        }
     }
 
     private void checkAndUpdateRentalStatus(Payment payment) {
