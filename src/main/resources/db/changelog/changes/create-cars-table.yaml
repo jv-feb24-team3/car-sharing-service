@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: add-rentals-table
-      author: omiazina
+      id: create-cars-table
+      author: Hadiuchko.Dmytro
       changes:
         - createTable:
-            tableName: rentals
+            tableName: cars
             columns:
               - column:
                   name: id
@@ -13,29 +13,28 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
-                  name: rental_date
-                  type: date
+                  name: brand
+                  type: varchar(255)
                   constraints:
                     nullable: false
               - column:
-                  name: return_date
-                  type: date
+                  name: type
+                  type: varchar(255)
                   constraints:
                     nullable: false
               - column:
-                  name: actual_return_date
-                  type: date
-              - column:
-                  name: car_id
-                  type: bigint
+                  name: inventory
+                  type: int
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_rentals_car_id
-                    references: cars(id)
               - column:
-                  name: user_id
-                  type: bigint
+                  name: daily_fee
+                  type: decimal(10,2)
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_rentals_user_id
-                    references: users(id)
+              - column:
+                  name: is_deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false

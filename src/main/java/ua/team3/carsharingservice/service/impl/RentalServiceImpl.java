@@ -69,6 +69,7 @@ public class RentalServiceImpl implements RentalService {
         Rental rental = rentalMapper.toModel(rentalDto);
         rental.setUser(user);
         rental.setCar(car);
+        rental.setStatus(Rental.Status.PENDING);
         Rental savedRental = rentalRepository.save(rental);
 
         paymentService.createPaymentForRental(savedRental);

@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-rentals-table
+      author: omiazina
+      changes:
+        - createTable:
+            tableName: rentals
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: rental_date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: return_date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: actual_return_date
+                  type: date
+              - column:
+                  name: car_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_rentals_car_id
+                    references: cars(id)
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_rentals_user_id
+                    references: users(id)
+              - column:
+                  name: status
+                  type: enum('PENDING', 'ACTIVE', 'OVERDUE', 'COMPLETED', 'CANCELLED')
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP

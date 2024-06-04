@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: add-payments-table
+      id: create-payments-table
       author: o.farion
       changes:
         - createTable:
@@ -29,6 +29,10 @@ databaseChangeLog:
                     foreignKeyName: fk_payments_rentals
                     references: rentals(id)
                     primaryKey: true
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
               - column:
                    name: session_url
                    type: varchar(2048)

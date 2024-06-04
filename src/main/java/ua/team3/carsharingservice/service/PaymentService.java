@@ -28,4 +28,6 @@ public interface PaymentService {
     void createPaymentForRental(Rental rental);
 
     void createFinePaymentIfNeeded(Rental rental);
+
+    void updateExpiredPayments();
 }

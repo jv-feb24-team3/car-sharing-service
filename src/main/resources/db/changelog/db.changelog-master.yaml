@@ -1,6 +1,6 @@
 databaseChangeLog:
   - include:
-      file: db/changelog/changes/add-cars-table.yaml
+      file: db/changelog/changes/create-cars-table.yaml
   - include:
       file: db/changelog/changes/create-users-table.yaml
   - include:
@@ -8,7 +8,7 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/create-users-roles-table.yaml
   - include:
-      file: db/changelog/changes/add-rentals-table.yaml
+      file: db/changelog/changes/create-rentals-table.yaml
   - include:
       file: db/changelog/changes/create-payments-table.yml
   - include:
