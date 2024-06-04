@@ -53,7 +53,7 @@ ease of use, and support for complex queries and transactions.
 ## Feature and functionality:
 ### User management:
 1. **Registration**: Users can register on the platform by providing their email, first name, last name, and password.
-    - [Registers a new user - demo.](https://drive.google.com/file/d/1V78I2bf0_0jdg136h_TWa6mlFnaiI3Cm/view?usp=drive_link) 
+    - [Registers a new user - demo.](images/Postman_xrr1ABMx93.gif) 
     ```bash
    POST: /auth/register
    ``` 
@@ -91,6 +91,13 @@ ease of use, and support for complex queries and transactions.
    DELETE: /cars/{carId}
    ```
 4. **View Cars**: All users, including unauthenticated users, can view the list of available cars and detailed information about each car.
+   - [View cars - demo](https://drive.google.com/file/d/1bmW9W3h1kQtfhU1GhV8XDo7oSsCWxhBN/view?usp=sharing)
+   ```bash
+   GET: /cars
+   ```
+   ```bash
+   GET: /cars/{carId}
+   ```
 ### Rental Management:
 1. **Create Rental**: Users can rent cars,  decreasing the inventory count by 1.
 2. **View Rental**: Users can view their active and past rentals. Admins can view rentals for all users.
@@ -109,3 +116,28 @@ ease of use, and support for complex queries and transactions.
 1. **Health Check**: A health check endpoint to monitor the status of the application.
 2. **API Documentation**: Integrated Swagger/OpenAPI documentation for easy exploration and testing of API endpoints.
 3. **Security**: Secure handling of sensitive data using environment variables and best practices in security.
+
+## Installation
+### Pre requirements:
+   - **Java Development Kit (JDK 21)**: Ensure that JDK is installed and the JAVA_HOME environment variable is set.
+   - **Maven**: Install Maven for building the project.
+   - **MySQL**: Install MySQL and create a database for the project.
+   - **Docker**: Ensure Docker and Docker Compose are installed for containerization
+### Steps:
+1. **Clone the Repository** 
+   ```bash
+    git clone https://github.com/jv-feb24-team3/car-sharing-service.git
+    cd car-sharing-service
+   ```
+2. **Set up Environments Variables**
+   - Create a .env file in the root directory of the project.
+   - Add the necessary environment variables. Use the provided .env.sample as a template.
+   ```.env
+   DB_URL=jdbc:mysql://localhost:3306/car_sharing_db
+   DB_USERNAME=your_user_name
+   DB_PASSWORD=your_password
+   JWT_SECRET=your_jwt_secret
+   STRIPE_SECRET_KEY=your_stripe_secret_key
+   TELEGRAM_BOT_TOKEN=your_telegram_bot_token
+   TELEGRAM_CHAT_ID=your_telegram_chat_id
+   ```
