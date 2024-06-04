@@ -85,12 +85,12 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void handlePaymentSuccess(String sessionId) {
-        handlePaymentStatusChanging(sessionId, PAID);
+        Payment payment = getUpdatedPayment(sessionId, PAID);
     }
 
     @Override
     public void handleFailed(String sessionId) {
-        handlePaymentStatusChanging(sessionId, EXPIRED);
+        Payment payment = getUpdatedPayment(sessionId, EXPIRED);
     }
 
     @Override
@@ -130,13 +130,13 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    private void handlePaymentStatusChanging(String sessionId, Payment.Status status) {
+    private Payment getUpdatedPayment(String sessionId, Payment.Status status) {
         Session session = paymentSystemService.getSession(sessionId);
         Payment payment = paymentRepository.findBySessionId(session.getId()).orElseThrow(
                 () -> new EntityNotFoundException("Can`t find payment with session id " + sessionId)
         );
         payment.setStatus(status);
-        paymentRepository.save(payment);
+        return paymentRepository.save(payment);
     }
 
     private void createPayment(Type paymentType, Rental rental) {
