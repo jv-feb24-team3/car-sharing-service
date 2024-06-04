@@ -24,9 +24,9 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             + "JOIN FETCH r.user u WHERE u.id = :userId")
     List<Payment> findPaymentsByUserId(@Param("userId") Long userId, Pageable pageable);
 
-    @Query("SELECT p FROM Payment p " +
-            "JOIN FETCH p.rental r " +
-            "JOIN FETCH r.user " +
-            "WHERE p.id = :id")
+    @Query("SELECT p FROM Payment p "
+            + "JOIN FETCH p.rental r "
+            + "JOIN FETCH r.user "
+            + "WHERE p.id = :id")
     Optional<Payment> findByIdAndFetchDetailsEagerly(@Param("id") Long id);
 }
