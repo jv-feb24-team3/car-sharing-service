@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ua.team3.carsharingservice.exception.NotificationSendingException;
+import ua.team3.carsharingservice.model.Payment;
 import ua.team3.carsharingservice.model.Rental;
 import ua.team3.carsharingservice.telegram.TelegramBot;
 
@@ -52,6 +53,19 @@ public class TelegramNotificationService implements NotificationService {
         }
     }
 
+    @Override
+    public void sendPaymentSuccessfulNotification(Payment payment) {
+        SendMessage response = new SendMessage();
+        response.setChatId(telegramBot.getAdminChatId());
+        response.setText(buildPaymentSuccessfulMessage(payment));
+        try {
+            telegramBot.execute(response);
+        } catch (TelegramApiException e) {
+            throw new NotificationSendingException("Failed to send notification "
+                    + "about successful payment with id: " + payment.getId());
+        }
+    }
+
     private String buildRentalCreatedMessage(Rental rental) {
         return String.format("New rental with id %d was created: "
                         + "Rental date %s, Car: %s, User: %s - ID: %d, Return date: %s",
@@ -70,5 +84,13 @@ public class TelegramNotificationService implements NotificationService {
                 rental.getUser().getLastName(),
                 rental.getUser().getEmail(),
                 rental.getReturnDate());
+    }
+
+    private String buildPaymentSuccessfulMessage(Payment payment) {
+        return String.format("Payment with id: %d was successfully paid by user %s %s (%s)",
+                payment.getId(),
+                payment.getRental().getUser().getFirstName(),
+                payment.getRental().getUser().getLastName(),
+                payment.getRental().getUser().getEmail());
     }
 }

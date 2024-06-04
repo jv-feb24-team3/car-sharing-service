@@ -44,6 +44,7 @@ import ua.team3.carsharingservice.repository.RentalRepository;
 import ua.team3.carsharingservice.service.PaymentHandler;
 import ua.team3.carsharingservice.service.PaymentService;
 import ua.team3.carsharingservice.service.PaymentSystemService;
+import ua.team3.carsharingservice.telegram.service.NotificationService;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final RentalRepository rentalRepository;
     private final PaymentMapper paymentMapper;
     private final PaymentHandlerFactory handlerFactory;
+    private final NotificationService notificationService;
 
     @Override
     public PaymentResponseUrlDto createPaymentSession(SessionCreateDto createDto, User user) {
@@ -97,6 +99,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public void handlePaymentSuccess(String sessionId) {
         Payment payment = updatePaymentStatus(sessionId, PAID);
+        notificationService.sendPaymentSuccessfulNotification(payment);
     }
 
     @Override
