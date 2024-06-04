@@ -5,6 +5,8 @@ import static ua.team3.carsharingservice.model.Payment.Status.PAID;
 import static ua.team3.carsharingservice.model.Payment.Status.PENDING;
 import static ua.team3.carsharingservice.model.Payment.Type.FINE;
 import static ua.team3.carsharingservice.model.Payment.Type.PAYMENT;
+import static ua.team3.carsharingservice.model.Rental.Status.CANCELLED;
+import static ua.team3.carsharingservice.model.Rental.Status.OVERDUE;
 import static ua.team3.carsharingservice.util.StripeConst.CANCELING_MESSAGE;
 import static ua.team3.carsharingservice.util.StripeConst.CANCEL_ENDPOINT;
 import static ua.team3.carsharingservice.util.StripeConst.SESSION_ID_PARAM;
@@ -70,6 +72,9 @@ public class PaymentServiceImpl implements PaymentService {
         String successUrl = buildSuccessUrl();
         String cancelUrl = buildCancelUrl();
         Payment payment = optionalPayment.get();
+        if (FINE.equals(payment.getType())) {
+            payment = createPayment(FINE, rental);
+        }
         Session session =
                 paymentSystemService.createPaymentSession(
                         payment,
@@ -133,6 +138,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (actualReturnDate != null
                 && returnDate.isBefore(actualReturnDate)) {
             createPayment(FINE, rental);
+            rental.setStatus(OVERDUE);
         }
     }
 
@@ -142,8 +148,18 @@ public class PaymentServiceImpl implements PaymentService {
         LocalDateTime timeLimit = LocalDateTime.now().minusHours(24);
         List<Payment> expiredPayments =
                 paymentRepository.findPendingPaymentsOlderThan(timeLimit);
-        expiredPayments.forEach(payment -> payment.setStatus(EXPIRED));
+        expiredPayments.forEach(this::checkAndUpdateRentalStatus);
         paymentRepository.saveAll(expiredPayments);
+    }
+
+    private void checkAndUpdateRentalStatus(Payment payment) {
+        Rental rental = payment.getRental();
+        payment.setStatus(EXPIRED);
+        if (rental.getStatus() != OVERDUE) {
+            rental.setStatus(CANCELLED);
+            rentalRepository.save(rental);
+        }
+        paymentRepository.save(payment);
     }
 
     private Payment updatePaymentStatus(String sessionId, Payment.Status status) {        Session session = paymentSystemService.getSession(sessionId);
@@ -154,7 +170,7 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepository.save(payment);
     }
 
-    private void createPayment(Type paymentType, Rental rental) {
+    private Payment createPayment(Type paymentType, Rental rental) {
         Payment payment = new Payment();
         payment.setRental(rental);
         payment.setType(paymentType);
@@ -164,7 +180,7 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal amount =
                 paymentHandler.calculateAmount(rental.getCar().getDailyFee(), rentalDays);
         payment.setAmount(amount);
-        paymentRepository.save(payment);
+        return paymentRepository.save(payment);
     }
 
     private List<PaymentDto> getAllPaymentsForAdmin(Pageable pageable) {
