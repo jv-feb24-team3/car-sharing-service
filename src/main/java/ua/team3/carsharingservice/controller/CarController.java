@@ -59,7 +59,7 @@ public class CarController {
             summary = "Return car by id",
             description = "Return details of car by its id",
             parameters =
-            @Parameter(name = "cartId",
+            @Parameter(name = "carId",
                     description = "Id of the car to be retrieved")
     )
     @GetMapping("/{carId}")
