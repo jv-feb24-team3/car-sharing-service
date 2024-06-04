@@ -91,7 +91,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testSaveUserSuccess() throws RegistrationException {
+    void saveUser_validData_success() throws RegistrationException {
         when(userRepository.existsByEmail(registrationRequestDto.getEmail())).thenReturn(false);
         when(userMapper.toModel(registrationRequestDto)).thenReturn(user);
         when(passwordEncoder.encode(registrationRequestDto.getPassword()))
@@ -114,7 +114,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testSaveUserThrowsRegistrationException() {
+    void saveUser_invalidRegistration_exception() {
         when(userRepository.existsByEmail(registrationRequestDto.getEmail())).thenReturn(true);
 
         assertThrows(RegistrationException.class, () -> userService.save(registrationRequestDto));
@@ -127,7 +127,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testUpdateUserRoleSuccess() {
+    void updateUserRole_validData_success() {
         when(userRepository.findById(roleUpdateDto.getUserId())).thenReturn(Optional.of(user));
         when(roleRepository.findByRole(roleUpdateDto.getRole())).thenReturn(Optional.of(role));
 
@@ -139,7 +139,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testUpdateUserRoleThrowsException() {
+    void updateUserRole_invalidIllegalArgument_exception() {
         when(userRepository.findById(roleUpdateDto.getUserId()))
                 .thenReturn(Optional.empty());
 
@@ -152,7 +152,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testGetUserByEmailSuccess() {
+    void getUserByEmail_validData_success() {
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(userResponseDto);
 
@@ -166,7 +166,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testGetUserByEmailThrowsException() {
+    void getUserByEmail_invalidIllegalArgument_exception() {
         when(userRepository.findByEmail(user.getEmail()))
                 .thenReturn(Optional.empty());
 
@@ -178,7 +178,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testUpdateUserProfileSuccess() {
+    void updateUserProfile_validData_success() {
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.encode(updateRequestDto.getPassword())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(user);
@@ -197,7 +197,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testUpdateUserProfileThrowsException() {
+    void updateUserProfile_invalidEntityNotFound_exception() {
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
@@ -210,7 +210,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testGetCurrentUserProfileSuccess() {
+    void getCurrentUserProfile_validData_success() {
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
 
@@ -235,7 +235,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testUpdateCurrentUserProfileSuccess() {
+    void updateCurrentUserProfile_validData_success() {
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
 
