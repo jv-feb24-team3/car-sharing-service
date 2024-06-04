@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: add-payments-table
+      id: create-payments-table
       author: o.farion
       changes:
         - createTable:
