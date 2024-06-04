@@ -16,7 +16,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     @Query("SELECT p FROM Payment p WHERE p.status = 'PENDING' "
             + "AND p.createdAt <= :timeLimit "
-            + "AND p.sessionId = null")
+            + "AND p.sessionId IS NULL")
     List<Payment> findPendingPaymentsOlderThan(@Param("timeLimit") LocalDateTime timeLimit);
 
     @Query("SELECT p FROM Payment p "
