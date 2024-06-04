@@ -5,9 +5,11 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ua.team3.carsharingservice.dto.RentalDto;
 import ua.team3.carsharingservice.dto.RentalRequestDto;
@@ -91,6 +93,19 @@ public class RentalServiceImpl implements RentalService {
         return isUserAdmin
                 ? rentalMapper::toDtoForAdmin
                 : rentalMapper::toDto;
+    }
+
+    @Transactional
+    @Scheduled(timeUnit = TimeUnit.DAYS, fixedRate = 1)
+    public void getOverdueRentals() {
+        List<Rental> overDueRentals = rentalRepository.getOverdueRentals();
+        if (!overDueRentals.isEmpty()) {
+            for (Rental overDueRental : overDueRentals) {
+                notificationService.sendOverdueRentalsNotification(overDueRental);
+            }
+        } else {
+            notificationService.sendNoOverdueRentalsNotification();
+        }
     }
 
     private void ensureRentalNotReturned(Rental rental) {

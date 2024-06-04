@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import ua.team3.carsharingservice.model.Rental;
 
 public interface RentalRepository extends JpaRepository<Rental, Long> {
@@ -24,4 +25,9 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
 
     @EntityGraph(attributePaths = {"car"})
     Optional<Rental> findById(Long id);
+
+    @Query(value = "SELECT * FROM rentals r "
+            + "WHERE r.return_date <= DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY) "
+            + "AND r.actual_return_date IS NULL", nativeQuery = true)
+    List<Rental> getOverdueRentals();
 }
