@@ -189,6 +189,10 @@ ease of use, and support for complex queries and transactions.
    # JWT Configuration
      JWT_SECRET=your_secret
      JWT_EXPIRATION=your_expiration
+   
+   # Swagger Configuration
+     OPENAPI_MODULE_NAME=your_api_module_name
+     OPENAPI_API_VERSION=your_api_version
    ```
 3. **Build the Project**
    ```bash
