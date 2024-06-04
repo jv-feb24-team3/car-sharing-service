@@ -8,16 +8,16 @@ import static com.stripe.param.checkout.SessionCreateParams.PaymentMethodType;
 import static ua.team3.carsharingservice.util.StripeConst.CONVERSATION_RATE;
 import static ua.team3.carsharingservice.util.StripeConst.CURRENCY;
 import static ua.team3.carsharingservice.util.StripeConst.DEFAULT_QUANTITY;
-import static ua.team3.carsharingservice.util.StripeConst.MIN_SESSION_LIFETIME_IN_SECONDS;
+import static ua.team3.carsharingservice.util.StripeConst.MIN_SESSION_LIFETIME_IN_HOURS;
 import static ua.team3.carsharingservice.util.StripeConst.SESSION_DURATION;
 
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -64,7 +64,8 @@ public class StripeService implements PaymentSystemService {
                 .setMode(Mode.PAYMENT)
                 .setSuccessUrl(successUrl)
                 .setCancelUrl(cancelUrl)
-                .setExpiresAt(Instant.now().plusSeconds(remainingSessionLifetime).getEpochSecond())
+                .setExpiresAt(Instant.now()
+                        .plus(remainingSessionLifetime, ChronoUnit.HOURS).getEpochSecond())
                 .addLineItem(buildLineItem(productName, payment.getAmount())).build();
     }
 
@@ -88,11 +89,9 @@ public class StripeService implements PaymentSystemService {
     }
 
     private long calculateRemainingSessionLifetime(LocalDateTime createdAt) {
-        Instant createdAtInstant = createdAt.toInstant(ZoneOffset.UTC);
-        Instant now = Instant.now();
-        long timePassedSeconds = ChronoUnit.SECONDS.between(createdAtInstant, now);
-        long sessionLifetimeSeconds = SESSION_DURATION * 3600;
-        long remainingSessionLifetime = sessionLifetimeSeconds - timePassedSeconds;
-        return Math.max(remainingSessionLifetime, MIN_SESSION_LIFETIME_IN_SECONDS);
+        LocalDateTime currentTime = LocalDateTime.now();
+        long sessionLifetimeInHours = Duration.between(createdAt, currentTime).toHours();
+        long remainingLifetimeInHours = SESSION_DURATION - sessionLifetimeInHours;
+        return Math.max(remainingLifetimeInHours, MIN_SESSION_LIFETIME_IN_HOURS);
     }
 }
