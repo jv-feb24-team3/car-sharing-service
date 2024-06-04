@@ -72,7 +72,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler({
             ForbiddenRentalCreationException.class,
-            RentalAlreadyReturnedException.class
+            RentalCantBeReturnedException.class
     })
     public ResponseEntity<Object> handleForbiddenRequestException(
             Exception e) {
