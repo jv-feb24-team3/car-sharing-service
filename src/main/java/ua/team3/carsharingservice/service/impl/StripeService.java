@@ -56,13 +56,15 @@ public class StripeService implements PaymentSystemService {
                                                    String productName,
                                                    String successUrl,
                                                    String cancelUrl) {
-        long expiresAt = calculateRemainingSessionLifetime(payment.getCreatedAt());
+
+        long remainingSessionLifetime =
+                calculateRemainingSessionLifetime(payment.getCreatedAt());
         return SessionCreateParams.builder()
                 .addPaymentMethodType(PaymentMethodType.CARD)
                 .setMode(Mode.PAYMENT)
                 .setSuccessUrl(successUrl)
                 .setCancelUrl(cancelUrl)
-                .setExpiresAt(expiresAt)
+                .setExpiresAt(Instant.now().plusSeconds(remainingSessionLifetime).getEpochSecond())
                 .addLineItem(buildLineItem(productName, payment.getAmount())).build();
     }
 
@@ -91,7 +93,6 @@ public class StripeService implements PaymentSystemService {
         long timePassedSeconds = ChronoUnit.SECONDS.between(createdAtInstant, now);
         long sessionLifetimeSeconds = SESSION_DURATION * 3600;
         long remainingSessionLifetime = sessionLifetimeSeconds - timePassedSeconds;
-        long expiresAt = now.getEpochSecond() + remainingSessionLifetime;
-        return Math.max(expiresAt, MIN_SESSION_LIFETIME_IN_SECONDS);
+        return Math.max(remainingSessionLifetime, MIN_SESSION_LIFETIME_IN_SECONDS);
     }
 }
