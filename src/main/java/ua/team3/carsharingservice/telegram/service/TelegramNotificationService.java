@@ -17,8 +17,7 @@ public class TelegramNotificationService implements NotificationService {
     @Override
     public void sendRentalCreatedNotification(Rental rental) {
         SendMessage response = new SendMessage();
-        String message = buildRentalCreatedMessage(rental);
-        response.setText(message);
+        response.setText(buildRentalCreatedMessage(rental));
         response.setChatId(telegramBot.getAdminChatId());
         try {
             telegramBot.execute(response);
