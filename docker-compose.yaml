@@ -34,8 +34,10 @@ services:
               "spring.jpa.properties.hibernate.dialect": "org.hibernate.dialect.MySQLDialect",
               "jwt.secret": "${JWT_SECRET}",
               "jwt.expiration": "${JWT_EXPIRATION}",
-              "bot.token": "${BOT_TOKEN}",
-              "bot.name": "${BOT_USERNAME}",
-              "stripe.api.key": "${STRIPE_API_KEY}"
+              "bot.token": "${TELEGRAM_BOT_TOKEN}",
+              "bot.name": "${TELEGRAM_BOT_USERNAME}",
+              "admin.chat.id": "${TELEGRAM_ADMIN_CHAT_ID}",
+              "stripe.api.key": "${STRIPE_API_KEY}",
+              "stripe.webhook.secret": "{STRIPE_WEBHOOK_SECRET}"
       }'
       JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
