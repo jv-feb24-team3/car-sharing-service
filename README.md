@@ -180,9 +180,11 @@ ease of use, and support for complex queries and transactions.
    # Telegram Bot Configuration
      BOT_USERNAME=your_telegram_user_name
      BOT_TOKEN=your_telegram_bot_token
+     TELEGRAM_ADMIN_CHAT_ID=your_chatId
 
    # Stripe API Configuration
      STRIPE_API_KEY=your_key
+     STRIPE_WEBHOOK_SECRET=your_webhook_secret
 
    # JWT Configuration
      JWT_SECRET=your_secret
