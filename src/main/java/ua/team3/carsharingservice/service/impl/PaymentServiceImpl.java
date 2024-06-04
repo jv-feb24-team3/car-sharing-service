@@ -10,6 +10,7 @@ import static ua.team3.carsharingservice.util.StripeConst.CANCEL_ENDPOINT;
 import static ua.team3.carsharingservice.util.StripeConst.SESSION_ID_PARAM;
 import static ua.team3.carsharingservice.util.StripeConst.STATUS_PAID;
 import static ua.team3.carsharingservice.util.StripeConst.SUCCESS_ENDPOINT;
+import static ua.team3.carsharingservice.util.StripeConst.SUCCESS_MESSAGE;
 
 import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityNotFoundException;
@@ -99,7 +100,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public String returnSuccessMessage() {
-        return CANCELING_MESSAGE;
+        return SUCCESS_MESSAGE;
     }
 
     @Override
