@@ -143,7 +143,7 @@ public class RentalServiceImpl implements RentalService {
                 Rental.Status.PENDING,
                 Rental.Status.OVERDUE
         );
-        List<Rental> rentalsWithDebt = rentalRepository.findByStatusIn(debtStatuses);
+        List<Rental> rentalsWithDebt = rentalRepository.findByStatusInAndUser(debtStatuses, user);
         if (!rentalsWithDebt.isEmpty()) {
             String rentalIds = rentalsWithDebt.stream()
                     .map(Rental::getId)
