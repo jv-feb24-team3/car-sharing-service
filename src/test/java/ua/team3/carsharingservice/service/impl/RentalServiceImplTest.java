@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -183,10 +184,30 @@ class RentalServiceImplTest {
                 ForbiddenRentalCreationException.class,
                 () -> {
                     rentalService.create(rentalRequestDto, user);
-            });
+                });
         assertEquals("The user has unreturned cars", exception.getMessage());
 
         verify(rentalRepository).findByUserId(user.getId());
+    }
+
+    @Test
+    @DisplayName("Create new rental having payment debt")
+    void createRental_debtPayment_exception() {
+        Rental overdueRental = new Rental();
+        overdueRental.setUser(user);
+        overdueRental.setRentalDate(LocalDate.now().minusDays(10));
+        overdueRental.setReturnDate(LocalDate.now().plusDays(5));
+        overdueRental.setActualReturnDate(null);
+        overdueRental.setStatus(Rental.Status.PENDING);
+
+        when(rentalRepository.findByStatusIn(anyList())).thenReturn(List.of(overdueRental));
+
+        ForbiddenRentalCreationException exception = assertThrows(
+                ForbiddenRentalCreationException.class,
+                () -> {
+                    rentalService.create(rentalRequestDto, user);
+                });
+        verify(rentalRepository).findByStatusIn(anyList());
     }
 
     @Test

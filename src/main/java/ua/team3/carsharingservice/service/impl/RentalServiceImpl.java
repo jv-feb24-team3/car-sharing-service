@@ -3,10 +3,12 @@ package ua.team3.carsharingservice.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -128,6 +130,25 @@ public class RentalServiceImpl implements RentalService {
 
     private void validateRentalPermissionFor(User user) {
         checkUnreturnedCarsFor(user);
+        ensureUserHasNoDebt(user);
+    }
+
+    private void ensureUserHasNoDebt(User user) {
+        List<Rental.Status> debtStatuses = Arrays.asList(
+                Rental.Status.PENDING,
+                Rental.Status.OVERDUE
+        );
+        List<Rental> rentalsWithDebt = rentalRepository.findByStatusIn(debtStatuses);
+        if (!rentalsWithDebt.isEmpty()) {
+            String rentalIds = rentalsWithDebt.stream()
+                    .map(Rental::getId)
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(", "));
+            throw new ForbiddenRentalCreationException(
+                    "The user has debt the rental with the following rental dates: "
+                            + rentalIds
+            );
+        }
     }
 
     private void checkUnreturnedCarsFor(User user) {

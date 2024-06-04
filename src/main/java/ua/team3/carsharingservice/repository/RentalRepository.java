@@ -31,4 +31,6 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
             + "AND r.actual_return_date IS NULL AND status NOT LIKE 'CANCELLED'",
                nativeQuery = true)
     List<Rental> getOverdueRentals();
+
+    List<Rental> findByStatusIn(List<Rental.Status> statuses);
 }
