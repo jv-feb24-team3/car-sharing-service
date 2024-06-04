@@ -140,12 +140,12 @@ public class RentalServiceImpl implements RentalService {
         );
         List<Rental> rentalsWithDebt = rentalRepository.findByStatusIn(debtStatuses);
         if (!rentalsWithDebt.isEmpty()) {
-            String rentalDates = rentalsWithDebt.stream()
-                    .map(r -> r.getRentalDate().toString())
+            String rentalIds = rentalsWithDebt.stream()
+                    .map(r -> r.getId().toString())
                     .collect(Collectors.joining(", "));
             throw new ForbiddenRentalCreationException(
                     "The user has debt the rental with the following rental dates: "
-                            + rentalDates
+                            + rentalIds
             );
         }
     }
