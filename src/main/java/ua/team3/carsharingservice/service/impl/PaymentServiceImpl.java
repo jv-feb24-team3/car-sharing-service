@@ -1,5 +1,6 @@
 package ua.team3.carsharingservice.service.impl;
 
+import static ua.team3.carsharingservice.model.Payment.Status.EXPIRED;
 import static ua.team3.carsharingservice.model.Payment.Status.PAID;
 import static ua.team3.carsharingservice.model.Payment.Status.PENDING;
 import static ua.team3.carsharingservice.model.Payment.Type.FINE;
@@ -9,7 +10,6 @@ import static ua.team3.carsharingservice.util.StripeConst.CANCEL_ENDPOINT;
 import static ua.team3.carsharingservice.util.StripeConst.SESSION_ID_PARAM;
 import static ua.team3.carsharingservice.util.StripeConst.STATUS_PAID;
 import static ua.team3.carsharingservice.util.StripeConst.SUCCESS_ENDPOINT;
-import static ua.team3.carsharingservice.util.StripeConst.SUCCESS_MESSAGE;
 
 import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityNotFoundException;
@@ -83,18 +83,22 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public String handlePaymentSuccess(String sessionId) {
-        Session session = paymentSystemService.getSession(sessionId);
-        Payment payment = paymentRepository.findBySessionId(session.getId()).orElseThrow(
-                () -> new EntityNotFoundException("Can`t find payment with session id " + sessionId)
-        );
-        payment.setStatus(PAID);
-        paymentRepository.save(payment);
-        return SUCCESS_MESSAGE;
+    public void handlePaymentSuccess(String sessionId) {
+        handlePaymentStatusChanging(sessionId, PAID);
     }
 
     @Override
-    public String handlePaymentCanceling() {
+    public void handleFailed(String sessionId) {
+        handlePaymentStatusChanging(sessionId, EXPIRED);
+    }
+
+    @Override
+    public String returnCancelMessage() {
+        return CANCELING_MESSAGE;
+    }
+
+    @Override
+    public String returnSuccessMessage() {
         return CANCELING_MESSAGE;
     }
 
@@ -123,6 +127,15 @@ public class PaymentServiceImpl implements PaymentService {
                 && returnDate.isBefore(actualReturnDate)) {
             createPayment(FINE, rental);
         }
+    }
+
+    private void handlePaymentStatusChanging(String sessionId, Payment.Status status) {
+        Session session = paymentSystemService.getSession(sessionId);
+        Payment payment = paymentRepository.findBySessionId(session.getId()).orElseThrow(
+                () -> new EntityNotFoundException("Can`t find payment with session id " + sessionId)
+        );
+        payment.setStatus(status);
+        paymentRepository.save(payment);
     }
 
     private void createPayment(Type paymentType, Rental rental) {

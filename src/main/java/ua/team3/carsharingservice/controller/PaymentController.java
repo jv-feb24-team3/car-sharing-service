@@ -71,9 +71,9 @@ public class PaymentController {
                     + "It is not intended to be called directly.")
     public String paymentSuccess(@RequestParam("session_id") String sessionId) {
         if (paymentService.isPaymentStatusPaid(sessionId)) {
-            return paymentService.handlePaymentSuccess(sessionId);
+            return paymentService.returnSuccessMessage();
         }
-        return paymentService.handlePaymentCanceling();
+        return paymentService.returnCancelMessage();
     }
 
     @GetMapping("/cancel")
@@ -82,6 +82,6 @@ public class PaymentController {
                     + "to redirect the user after a cancelled payment. "
                     + "It is not intended to be called directly.")
     public String paymentCancel() {
-        return paymentService.handlePaymentCanceling();
+        return paymentService.returnCancelMessage();
     }
 }

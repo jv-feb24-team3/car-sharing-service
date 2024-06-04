@@ -13,9 +13,13 @@ public interface PaymentService {
 
     List<PaymentDto> getPaymentsByUserId(Long userId, Pageable pageable);
 
-    String handlePaymentSuccess(String sessionId);
+    void handlePaymentSuccess(String sessionId);
 
-    String handlePaymentCanceling();
+    void handleFailed(String sessionId);
+
+    String returnCancelMessage();
+
+    String returnSuccessMessage();
 
     List<PaymentDto> getAllPayments(User user, Pageable pageable);
 
