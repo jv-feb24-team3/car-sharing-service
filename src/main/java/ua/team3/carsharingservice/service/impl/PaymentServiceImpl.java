@@ -33,6 +33,7 @@ import ua.team3.carsharingservice.dto.stripe.payment.PaymentDto;
 import ua.team3.carsharingservice.dto.stripe.payment.PaymentResponseUrlDto;
 import ua.team3.carsharingservice.dto.stripe.session.SessionCreateDto;
 import ua.team3.carsharingservice.exception.InvalidPaymentTypeException;
+import ua.team3.carsharingservice.exception.PaymentProcessedException;
 import ua.team3.carsharingservice.mapper.PaymentMapper;
 import ua.team3.carsharingservice.model.Car;
 import ua.team3.carsharingservice.model.Payment;
@@ -70,13 +71,13 @@ public class PaymentServiceImpl implements PaymentService {
             throw new EntityNotFoundException("Can't find " + createDto.getPaymentType()
                     + " payment for rental with id " + createDto.getRentalId());
         }
+        Payment payment = optionalPayment.get();
+        if (EXPIRED.equals(payment.getStatus())) {
+            handleExpiredPayment(payment, rental);
+        }
         Car car = rental.getCar();
         String successUrl = buildSuccessUrl();
         String cancelUrl = buildCancelUrl();
-        Payment payment = optionalPayment.get();
-        if (FINE.equals(payment.getType())) {
-            payment = createPayment(FINE, rental);
-        }
         Session session =
                 paymentSystemService.createPaymentSession(
                         payment,
@@ -104,7 +105,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void handleFailed(String sessionId) {
-        Payment payment = updatePaymentStatus(sessionId, EXPIRED);
+        updatePaymentStatus(sessionId, EXPIRED);
     }
 
     @Override
@@ -153,6 +154,16 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentRepository.findPendingPaymentsOlderThan(timeLimit);
         expiredPayments.forEach(this::checkAndUpdateRentalStatus);
         paymentRepository.saveAll(expiredPayments);
+    }
+
+    private void handleExpiredPayment(Payment payment, Rental rental) {
+        if (payment.getType().equals(FINE)) {
+            createPayment(FINE, rental);
+        } else if (payment.getType().equals(PAYMENT)) {
+            throw new PaymentProcessedException(
+                    "Unfortunately, the rental with id " + rental.getId() + " was canceled. "
+                            + "You can create a new one to reserve a car for yourself again");
+        }
     }
 
     private void checkAndUpdateRentalStatus(Payment payment) {
