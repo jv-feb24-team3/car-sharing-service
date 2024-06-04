@@ -73,10 +73,11 @@ public class PaymentServiceImpl implements PaymentService {
         }
         Payment payment = optionalPayment.get();
         if (EXPIRED.equals(payment.getStatus())) {
-            switch (paymentType) {
-                case FINE -> payment = createPayment(FINE, rental);
-                case PAYMENT -> throw new PaymentProcessedException(
-                        "This payment is already overdue, create a new rental");
+            if (paymentType.equals(FINE)) {
+                payment = createPayment(FINE, rental);
+            } else if (paymentType.equals(PAYMENT)) {
+                throw new PaymentProcessedException(
+                        "This payment is already expired, create a new rental");
             }
         }
         Car car = rental.getCar();
