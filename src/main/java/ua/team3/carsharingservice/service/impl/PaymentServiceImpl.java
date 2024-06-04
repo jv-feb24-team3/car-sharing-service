@@ -161,7 +161,7 @@ public class PaymentServiceImpl implements PaymentService {
             createPayment(FINE, rental);
         } else if (payment.getType().equals(PAYMENT)) {
             throw new PaymentProcessedException(
-                    "Unfortunately, the rental was canceled. "
+                    "Unfortunately, the rental with id " + rental.getId() + " was canceled. "
                             + "You can create a new one to reserve a car for yourself again");
         }
     }
