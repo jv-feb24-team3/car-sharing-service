@@ -41,6 +41,7 @@ public class SecurityConfig {
                                 .requestMatchers("/auth/**",
                                         "/payments/success",
                                         "/payments/cancel",
+                                        "/stripe/webhook",
                                         "/v3/api-docs/**",
                                         "/swagger-ui/**",
                                         "/error")
