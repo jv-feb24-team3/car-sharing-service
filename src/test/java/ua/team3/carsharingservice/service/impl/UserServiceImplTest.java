@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -92,7 +94,8 @@ class UserServiceImplTest {
     void testSaveUserSuccess() throws RegistrationException {
         when(userRepository.existsByEmail(registrationRequestDto.getEmail())).thenReturn(false);
         when(userMapper.toModel(registrationRequestDto)).thenReturn(user);
-        when(passwordEncoder.encode(registrationRequestDto.getPassword())).thenReturn("encodedPassword");
+        when(passwordEncoder.encode(registrationRequestDto.getPassword()))
+                .thenReturn("encodedPassword");
         when(roleRepository.findByRole(Role.RoleName.USER)).thenReturn(Optional.of(role));
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(userMapper.toDto(any(User.class))).thenReturn(userResponseDto);
@@ -137,9 +140,11 @@ class UserServiceImplTest {
 
     @Test
     void testUpdateUserRoleThrowsException() {
-        when(userRepository.findById(roleUpdateDto.getUserId())).thenReturn(Optional.empty());
+        when(userRepository.findById(roleUpdateDto.getUserId()))
+                .thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> userService.updateUserRole(roleUpdateDto));
+        assertThrows(IllegalArgumentException.class,
+                () -> userService.updateUserRole(roleUpdateDto));
 
         verify(userRepository).findById(roleUpdateDto.getUserId());
         verify(roleRepository, never()).findByRole(any());
@@ -162,9 +167,11 @@ class UserServiceImplTest {
 
     @Test
     void testGetUserByEmailThrowsException() {
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(user.getEmail()))
+                .thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> userService.getUserByEmail(user.getEmail()));
+        assertThrows(EntityNotFoundException.class,
+                () -> userService.getUserByEmail(user.getEmail()));
 
         verify(userRepository).findByEmail(user.getEmail());
         verify(userMapper, never()).toDto(any());
@@ -177,7 +184,8 @@ class UserServiceImplTest {
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(userMapper.toDto(any(User.class))).thenReturn(userResponseDto);
 
-        UserResponseDto responseDto = userService.updateUserProfile(user.getEmail(), updateRequestDto);
+        UserResponseDto responseDto = userService.updateUserProfile(
+                user.getEmail(), updateRequestDto);
 
         assertNotNull(responseDto);
         assertEquals(userResponseDto.getEmail(), responseDto.getEmail());
@@ -192,7 +200,8 @@ class UserServiceImplTest {
     void testUpdateUserProfileThrowsException() {
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> userService.updateUserProfile(user.getEmail(), updateRequestDto));
+        assertThrows(EntityNotFoundException.class,
+                () -> userService.updateUserProfile(user.getEmail(), updateRequestDto));
 
         verify(userRepository).findByEmail(user.getEmail());
         verify(passwordEncoder, never()).encode(any());
@@ -204,43 +213,54 @@ class UserServiceImplTest {
     void testGetCurrentUserProfileSuccess() {
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
-        when(SecurityContextHolder.getContext()).thenReturn(securityContext);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getName()).thenReturn(user.getEmail());
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(userMapper.toDto(user)).thenReturn(userResponseDto);
 
-        UserResponseDto responseDto = userService.getCurrentUserProfile();
+        try (MockedStatic<SecurityContextHolder>
+                     mockedSecurityContextHolder = mockStatic(SecurityContextHolder.class)) {
+            mockedSecurityContextHolder.when(SecurityContextHolder::getContext)
+                    .thenReturn(securityContext);
+            when(securityContext.getAuthentication()).thenReturn(authentication);
+            when(authentication.getName()).thenReturn(user.getEmail());
+            when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+            when(userMapper.toDto(user)).thenReturn(userResponseDto);
 
-        assertNotNull(responseDto);
-        assertEquals(userResponseDto.getEmail(), responseDto.getEmail());
+            UserResponseDto responseDto = userService.getCurrentUserProfile();
 
-        verify(authentication).getName();
-        verify(userRepository).findByEmail(user.getEmail());
-        verify(userMapper).toDto(user);
+            assertNotNull(responseDto);
+            assertEquals(userResponseDto.getEmail(), responseDto.getEmail());
+
+            verify(authentication).getName();
+            verify(userRepository).findByEmail(user.getEmail());
+            verify(userMapper).toDto(user);
+        }
     }
 
     @Test
     void testUpdateCurrentUserProfileSuccess() {
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
-        when(SecurityContextHolder.getContext()).thenReturn(securityContext);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getName()).thenReturn(user.getEmail());
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(passwordEncoder.encode(updateRequestDto.getPassword())).thenReturn("encodedPassword");
-        when(userRepository.save(any(User.class))).thenReturn(user);
-        when(userMapper.toDto(any(User.class))).thenReturn(userResponseDto);
 
-        UserResponseDto responseDto = userService.updateCurrentUserProfile(updateRequestDto);
+        try (MockedStatic<SecurityContextHolder>
+                     mockedSecurityContextHolder = mockStatic(SecurityContextHolder.class)) {
+            mockedSecurityContextHolder.when(SecurityContextHolder::getContext)
+                    .thenReturn(securityContext);
+            when(securityContext.getAuthentication()).thenReturn(authentication);
+            when(authentication.getName()).thenReturn(user.getEmail());
+            when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+            when(passwordEncoder.encode(updateRequestDto.getPassword()))
+                    .thenReturn("encodedPassword");
+            when(userRepository.save(any(User.class))).thenReturn(user);
+            when(userMapper.toDto(any(User.class))).thenReturn(userResponseDto);
 
-        assertNotNull(responseDto);
-        assertEquals(userResponseDto.getEmail(), responseDto.getEmail());
+            UserResponseDto responseDto = userService.updateCurrentUserProfile(updateRequestDto);
 
-        verify(authentication).getName();
-        verify(userRepository).findByEmail(user.getEmail());
-        verify(passwordEncoder).encode(updateRequestDto.getPassword());
-        verify(userRepository).save(any(User.class));
-        verify(userMapper).toDto(any(User.class));
+            assertNotNull(responseDto);
+            assertEquals(userResponseDto.getEmail(), responseDto.getEmail());
+
+            verify(authentication).getName();
+            verify(userRepository).findByEmail(user.getEmail());
+            verify(passwordEncoder).encode(updateRequestDto.getPassword());
+            verify(userRepository).save(any(User.class));
+            verify(userMapper).toDto(any(User.class));
+        }
     }
 }
