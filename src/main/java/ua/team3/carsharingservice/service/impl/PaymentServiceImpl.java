@@ -71,10 +71,12 @@ public class PaymentServiceImpl implements PaymentService {
         String cancelUrl = buildCancelUrl();
         Payment payment = optionalPayment.get();
         Session session =
-                paymentSystemService.createPaymentSession(car.getBrand(),
-                        payment.getAmount(),
+                paymentSystemService.createPaymentSession(
+                        payment,
+                        car.getBrand(),
                         successUrl,
-                        cancelUrl);
+                        cancelUrl
+                );
         setSessionToPayment(payment, session);
         return new PaymentResponseUrlDto(session.getUrl());
     }

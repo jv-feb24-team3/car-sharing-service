@@ -8,6 +8,7 @@ import static com.stripe.param.checkout.SessionCreateParams.PaymentMethodType;
 import static ua.team3.carsharingservice.util.StripeConst.CONVERSATION_RATE;
 import static ua.team3.carsharingservice.util.StripeConst.CURRENCY;
 import static ua.team3.carsharingservice.util.StripeConst.DEFAULT_QUANTITY;
+import static ua.team3.carsharingservice.util.StripeConst.MIN_SESSION_LIFETIME_IN_SECONDS;
 import static ua.team3.carsharingservice.util.StripeConst.SESSION_DURATION;
 
 import com.stripe.exception.StripeException;
@@ -15,21 +16,24 @@ import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ua.team3.carsharingservice.exception.StripeSessionException;
+import ua.team3.carsharingservice.model.Payment;
 import ua.team3.carsharingservice.service.PaymentSystemService;
 
 @Service
 @RequiredArgsConstructor
 public class StripeService implements PaymentSystemService {
-    public Session createPaymentSession(String productName,
-                                        BigDecimal amount,
+    public Session createPaymentSession(Payment payment,
+                                        String productName,
                                         String successUrl,
                                         String cancelUrl) {
         SessionCreateParams params =
-                buildSessionParams(productName, amount, successUrl, cancelUrl);
+                buildSessionParams(payment, productName, successUrl, cancelUrl);
         try {
             return Session.create(params);
         } catch (StripeException e) {
@@ -48,18 +52,18 @@ public class StripeService implements PaymentSystemService {
         return session;
     }
 
-    private SessionCreateParams buildSessionParams(String productName,
-                                                   BigDecimal amount,
+    private SessionCreateParams buildSessionParams(Payment payment,
+                                                   String productName,
                                                    String successUrl,
                                                    String cancelUrl) {
-        long expiresAt = Instant.now().plus(SESSION_DURATION, ChronoUnit.HOURS).getEpochSecond();
+        long expiresAt = calculateRemainingSessionLifetime(payment.getCreatedAt());
         return SessionCreateParams.builder()
                 .addPaymentMethodType(PaymentMethodType.CARD)
                 .setMode(Mode.PAYMENT)
                 .setSuccessUrl(successUrl)
                 .setCancelUrl(cancelUrl)
                 .setExpiresAt(expiresAt)
-                .addLineItem(buildLineItem(productName, amount)).build();
+                .addLineItem(buildLineItem(productName, payment.getAmount())).build();
     }
 
     private LineItem buildLineItem(String productName, BigDecimal amount) {
@@ -79,5 +83,15 @@ public class StripeService implements PaymentSystemService {
         return ProductData.builder()
                 .setName(productName)
                 .build();
+    }
+
+    private long calculateRemainingSessionLifetime(LocalDateTime createdAt) {
+        Instant createdAtInstant = createdAt.toInstant(ZoneOffset.UTC);
+        Instant now = Instant.now();
+        long timePassedSeconds = ChronoUnit.SECONDS.between(createdAtInstant, now);
+        long sessionLifetimeSeconds = SESSION_DURATION * 3600;
+        long remainingSessionLifetime = sessionLifetimeSeconds - timePassedSeconds;
+        long expiresAt = now.getEpochSecond() + remainingSessionLifetime;
+        return Math.max(expiresAt, MIN_SESSION_LIFETIME_IN_SECONDS);
     }
 }
