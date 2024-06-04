@@ -47,5 +47,4 @@ databaseChangeLog:
               - column:
                   name: created_at
                   type: datetime
-                  constraints:
-                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
