@@ -37,6 +37,8 @@ import ua.team3.carsharingservice.model.Rental;
 import ua.team3.carsharingservice.model.User;
 import ua.team3.carsharingservice.repository.CarRepository;
 import ua.team3.carsharingservice.repository.RentalRepository;
+import ua.team3.carsharingservice.service.PaymentService;
+import ua.team3.carsharingservice.telegram.service.NotificationService;
 
 @ExtendWith(MockitoExtension.class)
 class RentalServiceImplTest {
@@ -51,6 +53,10 @@ class RentalServiceImplTest {
     private CarRepository carRepository;
     @Mock
     private RentalMapper rentalMapper;
+    @Mock
+    private PaymentService paymentService;
+    @Mock
+    private NotificationService notificationService;
     @InjectMocks
     private RentalServiceImpl rentalService;
 
@@ -229,7 +235,7 @@ class RentalServiceImplTest {
                 .thenReturn(List.of(rental));
         when(rentalMapper.toDto(any(Rental.class))).thenReturn(rentalDto);
 
-        List<RentalDto> rentals = rentalService.getAll(user, pageable);
+        List<RentalDto> rentals = (List<RentalDto>) rentalService.getAll(user, pageable);
 
         assertNotNull(rentals);
         assertEquals(1, rentals.size());
