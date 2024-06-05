@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,11 +21,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 import ua.team3.carsharingservice.dto.CarWithoutInventoryDto;
 import ua.team3.carsharingservice.dto.RentalDto;
+import ua.team3.carsharingservice.dto.RentalForAdminDto;
 import ua.team3.carsharingservice.dto.RentalRequestDto;
 import ua.team3.carsharingservice.exception.ForbiddenRentalCreationException;
 import ua.team3.carsharingservice.exception.NoCarsAvailableException;
@@ -34,6 +38,7 @@ import ua.team3.carsharingservice.exception.RentalAlreadyReturnedException;
 import ua.team3.carsharingservice.mapper.RentalMapper;
 import ua.team3.carsharingservice.model.Car;
 import ua.team3.carsharingservice.model.Rental;
+import ua.team3.carsharingservice.model.Role;
 import ua.team3.carsharingservice.model.User;
 import ua.team3.carsharingservice.repository.CarRepository;
 import ua.team3.carsharingservice.repository.RentalRepository;
@@ -44,6 +49,7 @@ import ua.team3.carsharingservice.telegram.service.NotificationService;
 class RentalServiceImplTest {
     private static final Long RENTAL_ID = 1L;
     private static final Long USER_ID = 1L;
+    private static final Long USER_ADMIN_ID = 2L;
     private static final Long CAR_ID = 1L;
     private static final int CAR_INVENTORY = 5;
 
@@ -61,15 +67,24 @@ class RentalServiceImplTest {
     private RentalServiceImpl rentalService;
 
     private User user;
+    private User adminUser;
     private Car car;
     private Rental rental;
     private RentalRequestDto rentalRequestDto;
     private RentalDto rentalDto;
+    private RentalForAdminDto rentalDtoForAdmin;
+    private Pageable pageable;
 
     @BeforeEach
     void setUp() {
         user = new User();
         user.setId(USER_ID);
+
+        adminUser = new User();
+        adminUser.setId(USER_ADMIN_ID);
+        Role roleAdmin = new Role();
+        roleAdmin.setRole(Role.RoleName.ADMIN);
+        adminUser.getRoles().add(roleAdmin);
 
         car = new Car();
         car.setId(CAR_ID);
@@ -97,6 +112,15 @@ class RentalServiceImplTest {
         rentalDto.setCar(carWithoutInventoryDto);
         rentalDto.setRentalDate(rentalDate);
         rentalDto.setReturnDate(returnDate);
+
+        rentalDtoForAdmin = new RentalForAdminDto();
+        rentalDtoForAdmin.setId(RENTAL_ID);
+        rentalDtoForAdmin.setCar(carWithoutInventoryDto);
+        rentalDtoForAdmin.setRentalDate(rentalDate);
+        rentalDtoForAdmin.setReturnDate(returnDate);
+        rentalDtoForAdmin.setUserId(USER_ID);
+
+        pageable = Pageable.unpaged();
     }
 
     @Test
@@ -230,16 +254,36 @@ class RentalServiceImplTest {
     @Test
     @DisplayName("Get all rentals")
     void getAllRentals_validData_success() {
-        Pageable pageable = PageRequest.of(0, 10);
-        when(rentalRepository.findByUserId(anyLong(), any(Pageable.class)))
-                .thenReturn(List.of(rental));
+        List<Rental> rentals = Collections.singletonList(rental);
+
+        when(rentalRepository
+                .findByUserId(any(Specification.class), any(Long.class), any(Pageable.class)))
+                .thenReturn(rentals);
         when(rentalMapper.toDto(any(Rental.class))).thenReturn(rentalDto);
 
-        List<RentalDto> rentals = (List<RentalDto>) rentalService.getAll(user, pageable);
+        List<? extends RentalDto> result = rentalService.getAll(user, pageable, true, null);
 
-        assertNotNull(rentals);
-        assertEquals(1, rentals.size());
-        verify(rentalRepository).findByUserId(user.getId(), pageable);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(rentalDto, result.getFirst());
+    }
+
+    @Test
+    @DisplayName("Get all rentals for admin")
+    void getAllRentals_forAdminValidData_success() {
+        List<Rental> rentals = Collections.singletonList(rental);
+        Page<Rental> page = new PageImpl<>(rentals);
+
+        when(rentalRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(page);
+        when(rentalMapper.toDtoForAdmin(any(Rental.class))).thenReturn(rentalDtoForAdmin);
+
+        List<? extends RentalDto> result = rentalService.getAll(adminUser, pageable, false, null);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(rentalDtoForAdmin, result.getFirst());
+        verify(rentalRepository).findAll(any(Specification.class), any(Pageable.class));
     }
 
     @Test

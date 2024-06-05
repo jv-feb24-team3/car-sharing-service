@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ua.team3.carsharingservice.dto.RentalDto;
@@ -24,6 +25,7 @@ import ua.team3.carsharingservice.model.Rental;
 import ua.team3.carsharingservice.model.User;
 import ua.team3.carsharingservice.repository.CarRepository;
 import ua.team3.carsharingservice.repository.RentalRepository;
+import ua.team3.carsharingservice.repository.specification.rental.RentalSpecification;
 import ua.team3.carsharingservice.service.PaymentService;
 import ua.team3.carsharingservice.service.RentalService;
 import ua.team3.carsharingservice.telegram.service.NotificationService;
@@ -40,11 +42,18 @@ public class RentalServiceImpl implements RentalService {
     private final PaymentService paymentService;
 
     @Override
-    public List<? extends RentalDto> getAll(User user, Pageable pageable) {
+    public List<? extends RentalDto> getAll(User user, Pageable pageable,
+                                            Boolean isActive, Long userId) {
         boolean isUserAdmin = user.isAdmin();
+
+        Specification<Rental> spec = Specification.where(RentalSpecification.isActive(isActive));
+        if (isUserAdmin) {
+            spec = spec.and(RentalSpecification.hasUserId(userId));
+        }
+
         List<Rental> rentals = isUserAdmin
-                ? rentalRepository.findAll(pageable).getContent()
-                : rentalRepository.findByUserId(user.getId(), pageable);
+                ? rentalRepository.findAll(spec, pageable).getContent()
+                : rentalRepository.findByUserId(spec, user.getId(), pageable);
 
         return rentals.stream()
                 .map(getRentalMapper(isUserAdmin))

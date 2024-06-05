@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ua.team3.carsharingservice.dto.RentalDto;
@@ -35,8 +36,10 @@ public class RentalController {
                     + "If the user is an admin, returns all rentals."
     )
     @GetMapping
-    public List<? extends RentalDto> getAll(@AuthenticationPrincipal User user, Pageable pageable) {
-        return rentalService.getAll(user, pageable);
+    public List<? extends RentalDto> getAll(@AuthenticationPrincipal User user, Pageable pageable,
+                            @RequestParam(required = false, name = "is_active") Boolean isActive,
+                            @RequestParam(required = false, name = "user_id") Long userId) {
+        return rentalService.getAll(user, pageable, isActive, userId);
     }
 
     @Operation(
