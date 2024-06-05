@@ -96,6 +96,8 @@ public class RentalServiceImpl implements RentalService {
 
         rental.setActualReturnDate(LocalDate.now());
         rental.getCar().setInventory(rental.getCar().getInventory() + DEFAULT_CAR_COUNT);
+        //TODO: Possibly move to payment service
+        rental.setStatus(Rental.Status.COMPLETED);
         Rental savedRental = rentalRepository.save(rental);
         paymentService.createFinePaymentIfNeeded(savedRental);
         return rentalMapper.toDto(savedRental);
