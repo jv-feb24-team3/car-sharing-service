@@ -36,7 +36,6 @@ import ua.team3.carsharingservice.dto.stripe.session.SessionCreateDto;
 import ua.team3.carsharingservice.exception.InvalidPaymentTypeException;
 import ua.team3.carsharingservice.exception.PaymentProcessedException;
 import ua.team3.carsharingservice.mapper.PaymentMapper;
-import ua.team3.carsharingservice.model.Car;
 import ua.team3.carsharingservice.model.Payment;
 import ua.team3.carsharingservice.model.Payment.Type;
 import ua.team3.carsharingservice.model.Rental;
