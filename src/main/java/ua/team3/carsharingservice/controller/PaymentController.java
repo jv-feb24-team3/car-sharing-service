@@ -54,7 +54,7 @@ public class PaymentController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    @ResponseStatus(HttpStatus.SEE_OTHER)
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Create payment session",
             description = "Endpoint for creation of payment session")
     public void createPaymentSession(@RequestBody @Valid SessionCreateDto createDto,
