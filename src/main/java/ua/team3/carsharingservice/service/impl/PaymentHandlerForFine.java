@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import ua.team3.carsharingservice.model.Car;
 import ua.team3.carsharingservice.model.Rental;
 import ua.team3.carsharingservice.service.PaymentHandler;
 
@@ -13,7 +14,7 @@ import ua.team3.carsharingservice.service.PaymentHandler;
 @RequiredArgsConstructor
 public class PaymentHandlerForFine implements PaymentHandler {
     private static final String BILLING_TEMPLATE =
-            "Fine for %s, %s to %s (%d %s), Reason: Late return";
+            "Fine for %s, %s to %s (%d %s, $%d per day), Reason: Late return";
 
     @Override
     public long calculateDays(Rental rental) {
@@ -27,7 +28,9 @@ public class PaymentHandlerForFine implements PaymentHandler {
 
     @Override
     public String formBillingDetails(Rental rental) {
-        String carName = rental.getCar().getBrand();
+        Car car = rental.getCar();
+        String carName = car.getBrand();
+        long dailyFee = car.getDailyFee().multiply(FINE_MULTIPLAYER).longValue();
         String startDate = rental.getReturnDate().toString();
         String endDate = rental.getActualReturnDate().toString();
         long daysCount = calculateDays(rental);
@@ -36,6 +39,7 @@ public class PaymentHandlerForFine implements PaymentHandler {
                 startDate,
                 endDate,
                 daysCount,
-                daysCount == 1 ? "day" : "days");
+                daysCount == 1 ? "day" : "days",
+                dailyFee);
     }
 }
