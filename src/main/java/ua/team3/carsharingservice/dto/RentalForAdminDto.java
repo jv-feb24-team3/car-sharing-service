@@ -5,4 +5,5 @@ import lombok.Data;
 @Data
 public class RentalForAdminDto extends RentalDto {
     private Long userId;
+    private CarDto car;
 }

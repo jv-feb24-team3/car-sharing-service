@@ -27,9 +27,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
+import ua.team3.carsharingservice.dto.CarDto;
 import ua.team3.carsharingservice.dto.CarWithoutInventoryDto;
 import ua.team3.carsharingservice.dto.RentalDto;
 import ua.team3.carsharingservice.dto.RentalForAdminDto;
+import ua.team3.carsharingservice.dto.RentalForUserDto;
 import ua.team3.carsharingservice.dto.RentalRequestDto;
 import ua.team3.carsharingservice.exception.ForbiddenRentalCreationException;
 import ua.team3.carsharingservice.exception.NoCarsAvailableException;
@@ -72,7 +74,7 @@ class RentalServiceImplTest {
     private Car car;
     private Rental rental;
     private RentalRequestDto rentalRequestDto;
-    private RentalDto rentalDto;
+    private RentalForUserDto rentalDto;
     private RentalForAdminDto rentalDtoForAdmin;
     private Pageable pageable;
 
@@ -106,7 +108,7 @@ class RentalServiceImplTest {
         rentalRequestDto.setRentalDate(rentalDate);
         rentalRequestDto.setReturnDate(returnDate);
 
-        rentalDto = new RentalDto();
+        rentalDto = new RentalForUserDto();
         rentalDto.setId(RENTAL_ID);
         CarWithoutInventoryDto carWithoutInventoryDto = new CarWithoutInventoryDto();
         carWithoutInventoryDto.setId(CAR_ID);
@@ -116,7 +118,9 @@ class RentalServiceImplTest {
 
         rentalDtoForAdmin = new RentalForAdminDto();
         rentalDtoForAdmin.setId(RENTAL_ID);
-        rentalDtoForAdmin.setCar(carWithoutInventoryDto);
+        CarDto carDto = new CarDto();
+        carDto.setId(CAR_ID);
+        rentalDtoForAdmin.setCar(carDto);
         rentalDtoForAdmin.setRentalDate(rentalDate);
         rentalDtoForAdmin.setReturnDate(returnDate);
         rentalDtoForAdmin.setUserId(USER_ID);
