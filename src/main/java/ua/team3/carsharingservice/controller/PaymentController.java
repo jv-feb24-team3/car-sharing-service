@@ -56,8 +56,10 @@ public class PaymentController {
     @CrossOrigin(origins = {"https://checkout.stripe.com", "http://localhost:8080"}, maxAge = 3600)
     @Operation(summary = "Create payment session",
             description = "Endpoint for creation of payment session")
-    public ResponseEntity<String> createPaymentSession(@RequestBody @Valid SessionCreateDto createDto,
-                                     @AuthenticationPrincipal User user) {
+    public ResponseEntity<String> createPaymentSession(
+            @RequestBody @Valid SessionCreateDto createDto,
+            @AuthenticationPrincipal User user
+    ) {
         String sessionUrl = paymentService.createPaymentSession(createDto, user);
         return ResponseEntity.ok(sessionUrl);
     }
