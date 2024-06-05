@@ -28,7 +28,7 @@ public class StripeWebhookController {
     private String endpointSecret;
 
     @Operation(summary = "Endpoint for Stripe Webhook",
-    description = "This endpoint is used by Stripe for receiving requests about events. "
+            description = "This endpoint is used by Stripe for receiving requests about events. "
             + "It is not intended to be called directly.")
     @PostMapping("/webhook")
     public ResponseEntity<String> handleStripeWebhook(
