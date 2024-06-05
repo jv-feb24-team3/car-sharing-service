@@ -40,6 +40,11 @@ databaseChangeLog:
                   name: session_id
                   type: varchar(255)
               - column:
+                  name: billing_details
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
                   name: amount
                   type: decimal(38,2)
                   constraints:
