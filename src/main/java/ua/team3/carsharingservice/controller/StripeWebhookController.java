@@ -4,6 +4,8 @@ import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -17,12 +19,17 @@ import ua.team3.carsharingservice.service.PaymentService;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Endpoints for Stripe Webhook",
+        description = "Endpoints for receiving POST request from Stripe about events")
 @RequestMapping("/stripe")
 public class StripeWebhookController {
     private final PaymentService paymentService;
     @Value("${stripe.webhook.secret}")
     private String endpointSecret;
 
+    @Operation(summary = "Endpoint for Stripe Webhook",
+    description = "This endpoint is used by Stripe for receiving requests about events. "
+            + "It is not intended to be called directly.")
     @PostMapping("/webhook")
     public ResponseEntity<String> handleStripeWebhook(
             @RequestBody String payload,

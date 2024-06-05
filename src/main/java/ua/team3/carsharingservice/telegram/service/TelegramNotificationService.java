@@ -57,6 +57,7 @@ public class TelegramNotificationService implements NotificationService {
 
     @Override
     public void sendPaymentSuccessfulNotification(Payment payment) {
+        //TODO: remake without additional db query
         payment = paymentRepository.findByIdAndFetchDetailsEagerly(payment.getId()).get();
         SendMessage response = new SendMessage();
         response.setChatId(telegramBot.getAdminChatId());

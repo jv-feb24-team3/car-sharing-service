@@ -109,8 +109,8 @@ public class PaymentServiceImpl implements PaymentService {
             payment.getRental().setStatus(ACTIVE);
         } else if (FINE.equals(payment.getType())) {
             payment.getRental().setStatus(COMPLETED);
-            rentalRepository.save(payment.getRental());
         }
+        rentalRepository.save(payment.getRental());
         notificationService.sendPaymentSuccessfulNotification(payment);
     }
 

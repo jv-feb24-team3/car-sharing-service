@@ -50,6 +50,7 @@ public class OpenApi30Config {
                 .path("/cars", pathItemForGet)
                 .path("/cars/{carId}", pathItemForGet)
                 .path("/payments/success", pathItemForGet)
-                .path("/payments/cancel", pathItemForGet);
+                .path("/payments/cancel", pathItemForGet)
+                .path("/stripe/webhook", pathItemForPost);
     }
 }
