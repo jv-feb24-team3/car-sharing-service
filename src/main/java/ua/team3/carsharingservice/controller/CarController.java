@@ -31,10 +31,7 @@ public class CarController {
 
     @Operation(
             summary = "Create new car",
-            description = "Add new car to database. Only accessible by user with the ADMIN role.",
-            parameters =
-            @Parameter(name = "requestDto",
-                    description = "Dto containing details for creating car")
+            description = "Add new car to database. Only accessible by user with the ADMIN role."
     )
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
