@@ -18,31 +18,25 @@ import ua.team3.carsharingservice.dto.RentalDto;
 import ua.team3.carsharingservice.dto.RentalRequestDto;
 import ua.team3.carsharingservice.dto.RentalSearchParameters;
 import ua.team3.carsharingservice.exception.ForbiddenRentalCreationException;
-import ua.team3.carsharingservice.exception.NoCarsAvailableException;
 import ua.team3.carsharingservice.exception.NotValidRentalDateException;
 import ua.team3.carsharingservice.exception.NotValidReturnDateException;
 import ua.team3.carsharingservice.exception.RentalCantBeReturnedException;
 import ua.team3.carsharingservice.mapper.RentalMapper;
-import ua.team3.carsharingservice.model.Car;
 import ua.team3.carsharingservice.model.Rental;
 import ua.team3.carsharingservice.model.User;
-import ua.team3.carsharingservice.repository.CarRepository;
 import ua.team3.carsharingservice.repository.RentalRepository;
 import ua.team3.carsharingservice.repository.specification.rental.RentalSpecificationBuilder;
-import ua.team3.carsharingservice.service.PaymentService;
 import ua.team3.carsharingservice.service.RentalService;
+import ua.team3.carsharingservice.service.transaction.RentalTransaction;
 import ua.team3.carsharingservice.telegram.service.NotificationService;
 
 @Service
 @RequiredArgsConstructor
 public class RentalServiceImpl implements RentalService {
-    private static final int DEFAULT_CAR_COUNT = 1;
-
     private final RentalRepository rentalRepository;
-    private final CarRepository carRepository;
     private final RentalMapper rentalMapper;
+    private final RentalTransaction rentalTransaction;
     private final NotificationService notificationService;
-    private final PaymentService paymentService;
     private final RentalSpecificationBuilder specificationBuilder;
 
     @Override
@@ -67,37 +61,30 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    @Transactional
     public RentalDto create(RentalRequestDto rentalDto, User user) {
         validateRentalPeriod(rentalDto);
         validateRentalPermissionFor(user);
 
-        Car car = getCarById(rentalDto.getCarId());
-        decreaseInventoryInCar(car);
-
         Rental rental = rentalMapper.toModel(rentalDto);
         rental.setUser(user);
-        rental.setCar(car);
         rental.setStatus(Rental.Status.PENDING);
-        Rental savedRental = rentalRepository.save(rental);
 
-        paymentService.createPaymentForRental(savedRental);
+        Rental savedRental = rentalTransaction.create(rental);
         notificationService.sendRentalCreatedNotification(savedRental);
         return rentalMapper.toDto(savedRental);
     }
 
     @Override
-    @Transactional
     public RentalDto returnRental(Long id, User user) {
         Rental rental = getRentalByIdForUser(id, user);
         ensureRentalCanBeReturned(rental);
 
         rental.setActualReturnDate(LocalDate.now());
-        rental.getCar().setInventory(rental.getCar().getInventory() + DEFAULT_CAR_COUNT);
+        rental.getCar().setInventory(rental.getCar().getInventory() + 1);
         //TODO: Possibly move to payment service
         rental.setStatus(Rental.Status.COMPLETED);
-        Rental savedRental = rentalRepository.save(rental);
-        paymentService.createFinePaymentIfNeeded(savedRental);
+
+        Rental savedRental = rentalTransaction.returnRental(rental);
         return rentalMapper.toDto(savedRental);
     }
 
@@ -176,13 +163,6 @@ public class RentalServiceImpl implements RentalService {
         }
     }
 
-    private Car getCarById(Long id) {
-        return carRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Can't find a car by id: " + id
-                ));
-    }
-
     private Rental getRentalByIdForUser(Long id, User user) {
         boolean isUserAdmin = user.isAdmin();
         Optional<Rental> optionalRental = isUserAdmin
@@ -192,15 +172,5 @@ public class RentalServiceImpl implements RentalService {
         return optionalRental.orElseThrow(
                 () -> new EntityNotFoundException("Can't find a rental by id: " + id)
         );
-    }
-
-    private void decreaseInventoryInCar(Car car) {
-        int availableCarInventory = car.getInventory();
-        if (availableCarInventory < DEFAULT_CAR_COUNT) {
-            throw new NoCarsAvailableException(
-                    "There are no available cars of this type, please choose another"
-            );
-        }
-        car.setInventory(availableCarInventory - DEFAULT_CAR_COUNT);
     }
 }

@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,7 +34,6 @@ import ua.team3.carsharingservice.dto.RentalForUserDto;
 import ua.team3.carsharingservice.dto.RentalRequestDto;
 import ua.team3.carsharingservice.dto.RentalSearchParameters;
 import ua.team3.carsharingservice.exception.ForbiddenRentalCreationException;
-import ua.team3.carsharingservice.exception.NoCarsAvailableException;
 import ua.team3.carsharingservice.exception.NotValidRentalDateException;
 import ua.team3.carsharingservice.exception.NotValidReturnDateException;
 import ua.team3.carsharingservice.exception.RentalCantBeReturnedException;
@@ -44,10 +42,9 @@ import ua.team3.carsharingservice.model.Car;
 import ua.team3.carsharingservice.model.Rental;
 import ua.team3.carsharingservice.model.Role;
 import ua.team3.carsharingservice.model.User;
-import ua.team3.carsharingservice.repository.CarRepository;
 import ua.team3.carsharingservice.repository.RentalRepository;
 import ua.team3.carsharingservice.repository.specification.rental.RentalSpecificationBuilder;
-import ua.team3.carsharingservice.service.PaymentService;
+import ua.team3.carsharingservice.service.transaction.RentalTransaction;
 import ua.team3.carsharingservice.telegram.service.NotificationService;
 
 @ExtendWith(MockitoExtension.class)
@@ -61,11 +58,9 @@ class RentalServiceImplTest {
     @Mock
     private RentalRepository rentalRepository;
     @Mock
-    private CarRepository carRepository;
-    @Mock
     private RentalMapper rentalMapper;
     @Mock
-    private PaymentService paymentService;
+    private RentalTransaction rentalTransaction;
     @Mock
     private NotificationService notificationService;
     @Mock
@@ -135,9 +130,8 @@ class RentalServiceImplTest {
     @Test
     @DisplayName("Create new rental with valid values")
     void createRental_validData_success() {
-        when(carRepository.findById(anyLong())).thenReturn(Optional.of(car));
+        when(rentalTransaction.create(any(Rental.class))).thenReturn(rental);
         when(rentalMapper.toModel(any(RentalRequestDto.class))).thenReturn(rental);
-        when(rentalRepository.save(any(Rental.class))).thenReturn(rental);
         when(rentalMapper.toDto(any(Rental.class))).thenReturn(rentalDto);
 
         Rental expectedRental = new Rental();
@@ -149,10 +143,6 @@ class RentalServiceImplTest {
         RentalDto createdRental = rentalService.create(rentalRequestDto, user);
         assertNotNull(createdRental);
         EqualsBuilder.reflectionEquals(expectedRental, createdRental);
-        assertEquals(CAR_INVENTORY - 1, car.getInventory());
-
-        verify(carRepository).findById(rentalRequestDto.getCarId());
-        verify(rentalRepository).save(rental);
     }
 
     @Test
@@ -179,26 +169,6 @@ class RentalServiceImplTest {
                     rentalService.create(rentalRequestDto, user);
             });
         assertEquals("Return date should be after rental date", exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Create new rental with no cars available")
-    void createRental_noCarsAvailable_exception() {
-        car.setInventory(0);
-        when(carRepository.findById(anyLong())).thenReturn(Optional.of(car));
-
-        NoCarsAvailableException exception = assertThrows(
-                NoCarsAvailableException.class,
-                () -> {
-                    rentalService.create(rentalRequestDto, user);
-            });
-        assertEquals(
-                "There are no available cars of this type, please choose another",
-                exception.getMessage()
-        );
-
-        verify(carRepository).findById(rentalRequestDto.getCarId());
-        verify(rentalRepository, never()).save(any(Rental.class));
     }
 
     @Test
@@ -251,7 +221,7 @@ class RentalServiceImplTest {
 
         when(rentalRepository.findByIdAndUserId(anyLong(), anyLong()))
                 .thenReturn(Optional.of(rental));
-        when(rentalRepository.save(any(Rental.class))).thenReturn(rental);
+        when(rentalTransaction.returnRental(any(Rental.class))).thenReturn(rental);
         when(rentalMapper.toDto(any(Rental.class))).thenReturn(rentalDto);
 
         RentalDto result = rentalService.returnRental(RENTAL_ID, user);
@@ -261,7 +231,6 @@ class RentalServiceImplTest {
         assertEquals(rentalDto.getId(), result.getId());
         assertEquals(CAR_INVENTORY + 1, car.getInventory());
         verify(rentalRepository).findByIdAndUserId(RENTAL_ID, user.getId());
-        verify(rentalRepository).save(rental);
     }
 
     @Test
