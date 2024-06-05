@@ -10,6 +10,7 @@ import ua.team3.carsharingservice.service.PaymentHandler;
 @Component("PAYMENT")
 @RequiredArgsConstructor
 public class PaymentHandlerForPayment implements PaymentHandler {
+    private static final String BILLING_TEMPLATE = "%s, %s to %s (%d %s)";
 
     @Override
     public long calculateDays(Rental rental) {
@@ -19,5 +20,19 @@ public class PaymentHandlerForPayment implements PaymentHandler {
     @Override
     public BigDecimal calculateAmount(BigDecimal dailyFee, long rentalDays) {
         return dailyFee.multiply(BigDecimal.valueOf(rentalDays));
+    }
+
+    @Override
+    public String formBillingDetails(Rental rental) {
+        String carName = rental.getCar().getBrand();
+        String startDate = rental.getRentalDate().toString();
+        String endDate = rental.getReturnDate().toString();
+        long daysCount = calculateDays(rental);
+        return String.format(BILLING_TEMPLATE,
+                carName,
+                startDate,
+                endDate,
+                daysCount,
+                daysCount == 1 ? "day" : "days");
     }
 }

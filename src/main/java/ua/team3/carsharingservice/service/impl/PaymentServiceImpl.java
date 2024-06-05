@@ -79,13 +79,12 @@ public class PaymentServiceImpl implements PaymentService {
             throw new PaymentProcessedException(
                     "This payment is already paid");
         }
-        Car car = rental.getCar();
         String successUrl = buildSuccessUrl();
         String cancelUrl = buildCancelUrl();
         Session session =
                 paymentSystemService.createPaymentSession(
                         payment,
-                        car.getBrand(),
+                        payment.getBillingDetails(),
                         successUrl,
                         cancelUrl
                 );
@@ -208,6 +207,8 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal amount =
                 paymentHandler.calculateAmount(rental.getCar().getDailyFee(), rentalDays);
         payment.setAmount(amount);
+        String billingDetails = paymentHandler.formBillingDetails(rental);
+        payment.setBillingDetails(billingDetails);
         return paymentRepository.save(payment);
     }
 

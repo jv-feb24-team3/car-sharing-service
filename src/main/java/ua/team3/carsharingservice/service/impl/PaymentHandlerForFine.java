@@ -12,6 +12,9 @@ import ua.team3.carsharingservice.service.PaymentHandler;
 @Component("FINE")
 @RequiredArgsConstructor
 public class PaymentHandlerForFine implements PaymentHandler {
+    private static final String BILLING_TEMPLATE =
+            "Fine for %s, %s to %s (%d %s), Reason: Late return";
+
     @Override
     public long calculateDays(Rental rental) {
         return ChronoUnit.DAYS.between(rental.getReturnDate(), rental.getActualReturnDate());
@@ -20,5 +23,19 @@ public class PaymentHandlerForFine implements PaymentHandler {
     @Override
     public BigDecimal calculateAmount(BigDecimal dailyFee, long rentalDays) {
         return FINE_MULTIPLAYER.multiply(dailyFee).multiply(BigDecimal.valueOf(rentalDays));
+    }
+
+    @Override
+    public String formBillingDetails(Rental rental) {
+        String carName = rental.getCar().getBrand();
+        String startDate = rental.getReturnDate().toString();
+        String endDate = rental.getActualReturnDate().toString();
+        long daysCount = calculateDays(rental);
+        return String.format(BILLING_TEMPLATE,
+                carName,
+                startDate,
+                endDate,
+                daysCount,
+                daysCount == 1 ? "day" : "days");
     }
 }
