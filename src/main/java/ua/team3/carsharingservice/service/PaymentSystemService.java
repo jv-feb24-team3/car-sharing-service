@@ -5,7 +5,6 @@ import ua.team3.carsharingservice.model.Payment;
 
 public interface PaymentSystemService {
     Session createPaymentSession(Payment payment,
-                                 String productName,
                                  String successUrl,
                                  String cancelUrl);
 

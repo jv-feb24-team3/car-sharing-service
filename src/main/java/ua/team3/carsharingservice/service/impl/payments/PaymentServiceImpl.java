@@ -84,7 +84,6 @@ public class PaymentServiceImpl implements PaymentService {
         Session session =
                 paymentSystemService.createPaymentSession(
                         payment,
-                        payment.getBillingDetails(),
                         successUrl,
                         cancelUrl
                 );

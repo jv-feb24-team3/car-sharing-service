@@ -14,7 +14,6 @@ import static ua.team3.carsharingservice.util.StripeConst.SESSION_DURATION;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -29,11 +28,10 @@ import ua.team3.carsharingservice.service.PaymentSystemService;
 @RequiredArgsConstructor
 public class StripeService implements PaymentSystemService {
     public Session createPaymentSession(Payment payment,
-                                        String productName,
                                         String successUrl,
                                         String cancelUrl) {
         SessionCreateParams params =
-                buildSessionParams(payment, productName, successUrl, cancelUrl);
+                buildSessionParams(payment, successUrl, cancelUrl);
         try {
             return Session.create(params);
         } catch (StripeException e) {
@@ -53,7 +51,6 @@ public class StripeService implements PaymentSystemService {
     }
 
     private SessionCreateParams buildSessionParams(Payment payment,
-                                                   String productName,
                                                    String successUrl,
                                                    String cancelUrl) {
 
@@ -66,25 +63,25 @@ public class StripeService implements PaymentSystemService {
                 .setCancelUrl(cancelUrl)
                 .setExpiresAt(Instant.now()
                         .plus(remainingSessionLifetime, ChronoUnit.HOURS).getEpochSecond())
-                .addLineItem(buildLineItem(productName, payment.getAmount())).build();
+                .addLineItem(buildLineItem(payment)).build();
     }
 
-    private LineItem buildLineItem(String productName, BigDecimal amount) {
+    private LineItem buildLineItem(Payment payment) {
         return LineItem.builder()
                 .setQuantity(DEFAULT_QUANTITY)
-                .setPriceData(buildPriceData(productName, amount)).build();
+                .setPriceData(buildPriceData(payment)).build();
     }
 
-    private PriceData buildPriceData(String productName, BigDecimal amount) {
+    private PriceData buildPriceData(Payment payment) {
         return PriceData.builder()
                 .setCurrency(CURRENCY)
-                .setUnitAmount(amount.longValue() * CONVERSATION_RATE)
-                .setProductData(buildProductData(productName)).build();
+                .setUnitAmount(payment.getAmount().longValue() * CONVERSATION_RATE)
+                .setProductData(buildProductData(payment)).build();
     }
 
-    private ProductData buildProductData(String productName) {
+    private ProductData buildProductData(Payment payment) {
         return ProductData.builder()
-                .setName(productName)
+                .setName(payment.getBillingDetails())
                 .build();
     }
 
