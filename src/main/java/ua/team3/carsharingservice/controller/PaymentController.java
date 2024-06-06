@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,7 +52,6 @@ public class PaymentController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    @CrossOrigin(origins = {"https://checkout.stripe.com", "http://localhost:8080"}, maxAge = 3600)
     @Operation(summary = "Create payment session",
             description = "Endpoint for creation of payment session")
     public ResponseEntity<String> createPaymentSession(
