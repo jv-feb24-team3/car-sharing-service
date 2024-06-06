@@ -208,7 +208,7 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentHandler.calculateAmount(rental.getCar().getDailyFee(), rentalDays);
         payment.setAmount(amount);
         String billingDetails = paymentHandler.formBillingDetails(rental);
-        payment.setBillingDetails(billingDetails );
+        payment.setBillingDetails(billingDetails);
         return paymentRepository.save(payment);
     }
 
