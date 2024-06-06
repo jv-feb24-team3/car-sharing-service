@@ -26,6 +26,8 @@ public interface RentalMapper {
             @Mapping(source = "carId", target = "car.id"),
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "user", ignore = true),
+            @Mapping(target = "status", ignore = true),
+            @Mapping(target = "createdAt", ignore = true),
             @Mapping(target = "actualReturnDate", ignore = true)
     })
     Rental toModel(RentalRequestDto dto);
