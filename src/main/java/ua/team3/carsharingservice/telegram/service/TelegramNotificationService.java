@@ -2,6 +2,7 @@ package ua.team3.carsharingservice.telegram.service;
 
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -13,6 +14,7 @@ import ua.team3.carsharingservice.telegram.TelegramBot;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TelegramNotificationService implements NotificationService {
     private final TelegramBot telegramBot;
     private final PaymentRepository paymentRepository;
@@ -25,8 +27,8 @@ public class TelegramNotificationService implements NotificationService {
         try {
             telegramBot.execute(response);
         } catch (TelegramApiException e) {
-            throw new NotificationSendingException("Failed to send notification about "
-                    + "creating rental with id: " + rental.getId());
+            log.error("Failed to send notification about creating rental with id: {}",
+                    rental.getId());
         }
     }
 

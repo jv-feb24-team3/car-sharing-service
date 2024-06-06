@@ -1,7 +1,6 @@
 package ua.team3.carsharingservice.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.team3.carsharingservice.dto.RentalDto;
 import ua.team3.carsharingservice.dto.RentalRequestDto;
 import ua.team3.carsharingservice.dto.RentalSearchParameters;
@@ -101,12 +101,6 @@ public class RentalServiceImpl implements RentalService {
         return rentalMapper.toDto(savedRental);
     }
 
-    private Function<Rental, ? extends RentalDto> getRentalMapper(boolean isUserAdmin) {
-        return isUserAdmin
-                ? rentalMapper::toDtoForAdmin
-                : rentalMapper::toDto;
-    }
-
     @Transactional
     @Scheduled(timeUnit = TimeUnit.DAYS, fixedRate = 1)
     public void getOverdueRentals() {
@@ -118,6 +112,12 @@ public class RentalServiceImpl implements RentalService {
         } else {
             notificationService.sendNoOverdueRentalsNotification();
         }
+    }
+
+    private Function<Rental, ? extends RentalDto> getRentalMapper(boolean isUserAdmin) {
+        return isUserAdmin
+                ? rentalMapper::toDtoForAdmin
+                : rentalMapper::toDto;
     }
 
     private void ensureRentalCanBeReturned(Rental rental) {
