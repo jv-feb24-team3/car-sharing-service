@@ -1,6 +1,4 @@
-package ua.team3.carsharingservice.service.impl;
-
-import static ua.team3.carsharingservice.util.StripeConst.FINE_MULTIPLAYER;
+package ua.team3.carsharingservice.service.impl.payments.strategy;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
@@ -11,30 +9,30 @@ import ua.team3.carsharingservice.model.Rental;
 import ua.team3.carsharingservice.service.BillingFormatter;
 import ua.team3.carsharingservice.service.PaymentHandler;
 
-@Component("FINE")
+@Component("PAYMENT")
 @RequiredArgsConstructor
-public class PaymentHandlerForFine implements PaymentHandler {
-    private final BillingFormatter fineBillingFormatter;
+public class PaymentHandlerForPayment implements PaymentHandler {
+    private final BillingFormatter paymentBillingFormatter;
 
     @Override
     public long calculateDays(Rental rental) {
-        return ChronoUnit.DAYS.between(rental.getReturnDate(), rental.getActualReturnDate());
+        return ChronoUnit.DAYS.between(rental.getRentalDate(), rental.getReturnDate());
     }
 
     @Override
     public BigDecimal calculateAmount(BigDecimal dailyFee, long rentalDays) {
-        return FINE_MULTIPLAYER.multiply(dailyFee).multiply(BigDecimal.valueOf(rentalDays));
+        return dailyFee.multiply(BigDecimal.valueOf(rentalDays));
     }
 
     @Override
     public String formBillingDetails(Rental rental) {
         Car car = rental.getCar();
         String carName = car.getBrand();
-        long dailyFee = car.getDailyFee().multiply(FINE_MULTIPLAYER).longValue();
-        String startDate = rental.getReturnDate().toString();
-        String endDate = rental.getActualReturnDate().toString();
+        long dailyFee = car.getDailyFee().longValue();
+        String startDate = rental.getRentalDate().toString();
+        String endDate = rental.getReturnDate().toString();
         long daysCount = calculateDays(rental);
-        return fineBillingFormatter
+        return paymentBillingFormatter
                 .formBillingDetails(carName, startDate, endDate, daysCount, dailyFee);
     }
 }

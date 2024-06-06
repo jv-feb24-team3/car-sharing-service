@@ -1,4 +1,4 @@
-package ua.team3.carsharingservice.service.impl;
+package ua.team3.carsharingservice.service.impl.payments;
 
 import static ua.team3.carsharingservice.model.Payment.Status.EXPIRED;
 import static ua.team3.carsharingservice.model.Payment.Status.PAID;
@@ -45,6 +45,7 @@ import ua.team3.carsharingservice.repository.RentalRepository;
 import ua.team3.carsharingservice.service.PaymentHandler;
 import ua.team3.carsharingservice.service.PaymentService;
 import ua.team3.carsharingservice.service.PaymentSystemService;
+import ua.team3.carsharingservice.service.impl.payments.strategy.PaymentHandlerFactory;
 import ua.team3.carsharingservice.telegram.service.NotificationService;
 
 @Service
@@ -207,7 +208,7 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentHandler.calculateAmount(rental.getCar().getDailyFee(), rentalDays);
         payment.setAmount(amount);
         String billingDetails = paymentHandler.formBillingDetails(rental);
-        payment.setBillingDetails(billingDetails);
+        payment.setBillingDetails(billingDetails );
         return paymentRepository.save(payment);
     }
 

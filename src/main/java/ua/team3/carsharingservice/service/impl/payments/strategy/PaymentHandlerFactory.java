@@ -1,4 +1,4 @@
-package ua.team3.carsharingservice.service.impl;
+package ua.team3.carsharingservice.service.impl.payments.strategy;
 
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

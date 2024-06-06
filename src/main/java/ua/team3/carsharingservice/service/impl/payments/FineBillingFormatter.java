@@ -1,4 +1,4 @@
-package ua.team3.carsharingservice.service.impl;
+package ua.team3.carsharingservice.service.impl.payments;
 
 import org.springframework.stereotype.Component;
 import ua.team3.carsharingservice.service.BillingFormatter;
