@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import lombok.Data;
 
 @Data
-public class RentalDto {
+public abstract class RentalDto {
     private static final String DATE_PATTERN = "yyyy-MM-dd";
 
     private Long id;
@@ -15,5 +15,5 @@ public class RentalDto {
     private LocalDate returnDate;
     @JsonFormat(pattern = DATE_PATTERN)
     private LocalDate actualReturnDate;
-    private CarWithoutInventoryDto car;
+    private String status;
 }
