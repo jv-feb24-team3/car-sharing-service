@@ -7,4 +7,6 @@ public interface PaymentHandler {
     long calculateDays(Rental rental);
 
     BigDecimal calculateAmount(BigDecimal dailyFee, long rentalDays);
+
+    String formBillingDetails(Rental rental);
 }

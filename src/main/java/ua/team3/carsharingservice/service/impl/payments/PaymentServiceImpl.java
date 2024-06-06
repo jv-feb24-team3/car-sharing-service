@@ -1,4 +1,4 @@
-package ua.team3.carsharingservice.service.impl;
+package ua.team3.carsharingservice.service.impl.payments;
 
 import static ua.team3.carsharingservice.model.Payment.Status.EXPIRED;
 import static ua.team3.carsharingservice.model.Payment.Status.PAID;
@@ -36,7 +36,6 @@ import ua.team3.carsharingservice.dto.stripe.session.SessionCreateDto;
 import ua.team3.carsharingservice.exception.InvalidPaymentTypeException;
 import ua.team3.carsharingservice.exception.PaymentProcessedException;
 import ua.team3.carsharingservice.mapper.PaymentMapper;
-import ua.team3.carsharingservice.model.Car;
 import ua.team3.carsharingservice.model.Payment;
 import ua.team3.carsharingservice.model.Payment.Type;
 import ua.team3.carsharingservice.model.Rental;
@@ -46,6 +45,7 @@ import ua.team3.carsharingservice.repository.RentalRepository;
 import ua.team3.carsharingservice.service.PaymentHandler;
 import ua.team3.carsharingservice.service.PaymentService;
 import ua.team3.carsharingservice.service.PaymentSystemService;
+import ua.team3.carsharingservice.service.impl.payments.strategy.PaymentHandlerFactory;
 import ua.team3.carsharingservice.telegram.service.NotificationService;
 
 @Service
@@ -79,13 +79,12 @@ public class PaymentServiceImpl implements PaymentService {
             throw new PaymentProcessedException(
                     "This payment is already paid");
         }
-        Car car = rental.getCar();
         String successUrl = buildSuccessUrl();
         String cancelUrl = buildCancelUrl();
         Session session =
                 paymentSystemService.createPaymentSession(
                         payment,
-                        car.getBrand(),
+                        payment.getBillingDetails(),
                         successUrl,
                         cancelUrl
                 );
@@ -208,6 +207,8 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal amount =
                 paymentHandler.calculateAmount(rental.getCar().getDailyFee(), rentalDays);
         payment.setAmount(amount);
+        String billingDetails = paymentHandler.formBillingDetails(rental);
+        payment.setBillingDetails(billingDetails);
         return paymentRepository.save(payment);
     }
 

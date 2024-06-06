@@ -1,4 +1,4 @@
-package ua.team3.carsharingservice.service.impl;
+package ua.team3.carsharingservice.service.impl.payments;
 
 import static com.stripe.param.checkout.SessionCreateParams.LineItem;
 import static com.stripe.param.checkout.SessionCreateParams.LineItem.PriceData;

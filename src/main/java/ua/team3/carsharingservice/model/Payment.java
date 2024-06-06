@@ -40,6 +40,8 @@ public class Payment {
     private String sessionUrl;
     private String sessionId;
     @Column(nullable = false)
+    private String billingDetails;
+    @Column(nullable = false)
     private BigDecimal amount;
 
     public enum Status {
