@@ -32,7 +32,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.team3.carsharingservice.dto.stripe.payment.PaymentDto;
-import ua.team3.carsharingservice.dto.stripe.payment.PaymentResponseUrlDto;
 import ua.team3.carsharingservice.dto.stripe.session.SessionCreateDto;
 import ua.team3.carsharingservice.exception.InvalidPaymentTypeException;
 import ua.team3.carsharingservice.exception.PaymentProcessedException;
@@ -60,7 +59,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final NotificationService notificationService;
 
     @Override
-    public PaymentResponseUrlDto createPaymentSession(SessionCreateDto createDto, User user) {
+    public String createPaymentSession(SessionCreateDto createDto, User user) {
         Rental rental = rentalRepository.findByIdAndUserId(createDto.getRentalId(), user.getId())
                 .orElseThrow(
                         () -> new EntityNotFoundException("You don't have rental with id: "
@@ -91,7 +90,7 @@ public class PaymentServiceImpl implements PaymentService {
                         cancelUrl
                 );
         setSessionToPayment(payment, session);
-        return new PaymentResponseUrlDto(session.getUrl());
+        return session.getUrl();
     }
 
     @Override
