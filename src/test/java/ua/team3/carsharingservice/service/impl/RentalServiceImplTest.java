@@ -31,6 +31,7 @@ import ua.team3.carsharingservice.dto.CarWithoutInventoryDto;
 import ua.team3.carsharingservice.dto.RentalDto;
 import ua.team3.carsharingservice.dto.RentalForAdminDto;
 import ua.team3.carsharingservice.dto.RentalRequestDto;
+import ua.team3.carsharingservice.dto.RentalSearchParameters;
 import ua.team3.carsharingservice.exception.ForbiddenRentalCreationException;
 import ua.team3.carsharingservice.exception.NoCarsAvailableException;
 import ua.team3.carsharingservice.exception.NotValidRentalDateException;
@@ -43,6 +44,7 @@ import ua.team3.carsharingservice.model.Role;
 import ua.team3.carsharingservice.model.User;
 import ua.team3.carsharingservice.repository.CarRepository;
 import ua.team3.carsharingservice.repository.RentalRepository;
+import ua.team3.carsharingservice.repository.specification.rental.RentalSpecificationBuilder;
 import ua.team3.carsharingservice.service.PaymentService;
 import ua.team3.carsharingservice.telegram.service.NotificationService;
 
@@ -64,6 +66,8 @@ class RentalServiceImplTest {
     private PaymentService paymentService;
     @Mock
     private NotificationService notificationService;
+    @Mock
+    private RentalSpecificationBuilder specificationBuilder;
     @InjectMocks
     private RentalServiceImpl rentalService;
 
@@ -277,35 +281,22 @@ class RentalServiceImplTest {
     @DisplayName("Get all rentals")
     void getAllRentals_validData_success() {
         List<Rental> rentals = Collections.singletonList(rental);
+        Page<Rental> page = new PageImpl<>(rentals);
+        RentalSearchParameters rentalSearchParameters =
+                new RentalSearchParameters(null, null);
 
-        when(rentalRepository
-                .findByUserId(any(Specification.class), any(Long.class), any(Pageable.class)))
-                .thenReturn(rentals);
+        when(specificationBuilder.build(rentalSearchParameters))
+                .thenReturn(Specification.where(null));
+        when(rentalRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(page);
         when(rentalMapper.toDto(any(Rental.class))).thenReturn(rentalDto);
 
-        List<? extends RentalDto> result = rentalService.getAll(user, pageable, true, null);
+        List<? extends RentalDto> result =
+                rentalService.getAll(user, pageable, rentalSearchParameters);
 
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(rentalDto, result.getFirst());
-    }
-
-    @Test
-    @DisplayName("Get all rentals for admin")
-    void getAllRentals_forAdminValidData_success() {
-        List<Rental> rentals = Collections.singletonList(rental);
-        Page<Rental> page = new PageImpl<>(rentals);
-
-        when(rentalRepository.findAll(any(Specification.class), any(Pageable.class)))
-                .thenReturn(page);
-        when(rentalMapper.toDtoForAdmin(any(Rental.class))).thenReturn(rentalDtoForAdmin);
-
-        List<? extends RentalDto> result = rentalService.getAll(adminUser, pageable, false, null);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(rentalDtoForAdmin, result.getFirst());
-        verify(rentalRepository).findAll(any(Specification.class), any(Pageable.class));
     }
 
     @Test

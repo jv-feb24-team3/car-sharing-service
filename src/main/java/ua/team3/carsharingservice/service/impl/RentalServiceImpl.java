@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ua.team3.carsharingservice.dto.RentalDto;
 import ua.team3.carsharingservice.dto.RentalRequestDto;
+import ua.team3.carsharingservice.dto.RentalSearchParameters;
 import ua.team3.carsharingservice.exception.ForbiddenRentalCreationException;
 import ua.team3.carsharingservice.exception.NoCarsAvailableException;
 import ua.team3.carsharingservice.exception.NotValidRentalDateException;
@@ -27,7 +28,7 @@ import ua.team3.carsharingservice.model.Rental;
 import ua.team3.carsharingservice.model.User;
 import ua.team3.carsharingservice.repository.CarRepository;
 import ua.team3.carsharingservice.repository.RentalRepository;
-import ua.team3.carsharingservice.repository.specification.rental.RentalSpecification;
+import ua.team3.carsharingservice.repository.specification.rental.RentalSpecificationBuilder;
 import ua.team3.carsharingservice.service.PaymentService;
 import ua.team3.carsharingservice.service.RentalService;
 import ua.team3.carsharingservice.telegram.service.NotificationService;
@@ -42,21 +43,18 @@ public class RentalServiceImpl implements RentalService {
     private final RentalMapper rentalMapper;
     private final NotificationService notificationService;
     private final PaymentService paymentService;
+    private final RentalSpecificationBuilder specificationBuilder;
 
     @Override
     public List<? extends RentalDto> getAll(User user, Pageable pageable,
-                                            Boolean isActive, Long userId) {
+                                            RentalSearchParameters searchParameters) {
         boolean isUserAdmin = user.isAdmin();
-
-        Specification<Rental> spec = Specification.where(RentalSpecification.isActive(isActive));
-        if (isUserAdmin) {
-            spec = spec.and(RentalSpecification.hasUserId(userId));
+        if (!isUserAdmin) {
+            searchParameters.setUserIds(new Long[]{user.getId()});
         }
+        Specification<Rental> spec = specificationBuilder.build(searchParameters);
 
-        List<Rental> rentals = isUserAdmin
-                ? rentalRepository.findAll(spec, pageable).getContent()
-                : rentalRepository.findByUserId(spec, user.getId(), pageable);
-
+        List<Rental> rentals = rentalRepository.findAll(spec, pageable).getContent();
         return rentals.stream()
                 .map(getRentalMapper(isUserAdmin))
                 .toList();
@@ -161,7 +159,7 @@ public class RentalServiceImpl implements RentalService {
                     .map(String::valueOf)
                     .collect(Collectors.joining(", "));
             throw new ForbiddenRentalCreationException(
-                    "The user has debt the rental with the following rental dates: "
+                    "The user has debt the rental with the following rental ids: "
                             + rentalIds
             );
         }

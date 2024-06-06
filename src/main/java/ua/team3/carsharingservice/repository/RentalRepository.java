@@ -22,9 +22,6 @@ public interface RentalRepository extends JpaRepository<Rental, Long>,
     List<Rental> findByUserId(Long userId);
 
     @EntityGraph(attributePaths = {"car"})
-    List<Rental> findByUserId(Specification<Rental> spec, Long userId, Pageable pageable);
-
-    @EntityGraph(attributePaths = {"car"})
     Optional<Rental> findByIdAndUserId(Long id, Long userId);
 
     @EntityGraph(attributePaths = {"car"})

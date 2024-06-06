@@ -4,10 +4,12 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import ua.team3.carsharingservice.dto.RentalDto;
 import ua.team3.carsharingservice.dto.RentalRequestDto;
+import ua.team3.carsharingservice.dto.RentalSearchParameters;
 import ua.team3.carsharingservice.model.User;
 
 public interface RentalService {
-    List<? extends RentalDto> getAll(User user, Pageable pageable, Boolean isActive, Long userId);
+    List<? extends RentalDto> getAll(User user, Pageable pageable,
+                                     RentalSearchParameters searchParameters);
 
     <T extends RentalDto> T getById(Long id, User user);
 

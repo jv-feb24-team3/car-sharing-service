@@ -1,6 +1,8 @@
 package ua.team3.carsharingservice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,11 +17,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ua.team3.carsharingservice.dto.RentalDto;
 import ua.team3.carsharingservice.dto.RentalRequestDto;
+import ua.team3.carsharingservice.dto.RentalSearchParameters;
 import ua.team3.carsharingservice.model.User;
 import ua.team3.carsharingservice.service.RentalService;
 
@@ -33,13 +35,17 @@ public class RentalController {
     @Operation(
             summary = "Return list of rentals",
             description = "Returns a paginated list of rentals for the authenticated user. "
-                    + "If the user is an admin, returns all rentals."
+                    + "If the user is an admin, it returns rentals for all users, "
+                    + "optionally filtered by active status and user ID."
     )
+    @Parameters({
+            @Parameter(name = "is_active", description = "Filter rentals by active status", required = false),
+            @Parameter(name = "user_id", description = "Filter rentals by user ID (admin only)", required = false)
+    })
     @GetMapping
     public List<? extends RentalDto> getAll(@AuthenticationPrincipal User user, Pageable pageable,
-                            @RequestParam(required = false, name = "is_active") Boolean isActive,
-                            @RequestParam(required = false, name = "user_id") Long userId) {
-        return rentalService.getAll(user, pageable, isActive, userId);
+                                            @Valid RentalSearchParameters searchParameters) {
+        return rentalService.getAll(user, pageable, searchParameters);
     }
 
     @Operation(
