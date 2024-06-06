@@ -39,8 +39,10 @@ public class RentalController {
                     + "optionally filtered by active status and user ID."
     )
     @Parameters({
-            @Parameter(name = "is_active", description = "Filter rentals by active status", required = false),
-            @Parameter(name = "user_id", description = "Filter rentals by user ID (admin only)", required = false)
+            @Parameter(name = "is_active",
+                    description = "Filter rentals by active status", required = false),
+            @Parameter(name = "user_id",
+                    description = "Filter rentals by user ID (admin only)", required = false)
     })
     @GetMapping
     public List<? extends RentalDto> getAll(@AuthenticationPrincipal User user, Pageable pageable,
