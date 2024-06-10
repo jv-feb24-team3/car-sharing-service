@@ -1,5 +1,9 @@
 # Car Sharing Service 
 
+ **Deployed project Swagger URL:**
+
+[![Swagger UI](https://img.shields.io/badge/Swagger-UI-green)](http://ec2-52-207-231-51.compute-1.amazonaws.com/api/swagger-ui/index.html#/)
+
 ## Overview
 The Car Sharing Service is a web-based platform designed to manage car sharing
 inventory, rentals, customers, notifications, and payments.
