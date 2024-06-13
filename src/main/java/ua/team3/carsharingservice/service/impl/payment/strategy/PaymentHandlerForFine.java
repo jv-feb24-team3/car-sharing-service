@@ -1,4 +1,4 @@
-package ua.team3.carsharingservice.service.impl.payments.strategy;
+package ua.team3.carsharingservice.service.impl.payment.strategy;
 
 import static ua.team3.carsharingservice.util.StripeConst.FINE_MULTIPLAYER;
 

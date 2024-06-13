@@ -1,12 +1,12 @@
-package ua.team3.carsharingservice.service.impl.payments;
+package ua.team3.carsharingservice.service.impl.payment;
 
 import org.springframework.stereotype.Component;
 import ua.team3.carsharingservice.service.BillingFormatter;
 
 @Component
-public class FineBillingFormatter implements BillingFormatter {
+public class PaymentBillingFormatter implements BillingFormatter {
     private static final String BILLING_TEMPLATE =
-            "Fine for %s, %s to %s (%d %s, $%d per day), Reason: Late return";
+            "Rental for %s, %s to %s (%d %s, $%d per day)";
 
     @Override
     public String formBillingDetails(String carName,

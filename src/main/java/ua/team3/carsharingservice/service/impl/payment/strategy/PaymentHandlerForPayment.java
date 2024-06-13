@@ -1,4 +1,4 @@
-package ua.team3.carsharingservice.service.impl.payments.strategy;
+package ua.team3.carsharingservice.service.impl.payment.strategy;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;

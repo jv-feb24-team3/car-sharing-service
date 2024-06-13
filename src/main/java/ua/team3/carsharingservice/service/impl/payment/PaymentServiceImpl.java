@@ -1,4 +1,4 @@
-package ua.team3.carsharingservice.service.impl.payments;
+package ua.team3.carsharingservice.service.impl.payment;
 
 import static ua.team3.carsharingservice.model.Payment.Status.EXPIRED;
 import static ua.team3.carsharingservice.model.Payment.Status.PAID;
@@ -45,7 +45,7 @@ import ua.team3.carsharingservice.repository.RentalRepository;
 import ua.team3.carsharingservice.service.PaymentHandler;
 import ua.team3.carsharingservice.service.PaymentService;
 import ua.team3.carsharingservice.service.PaymentSystemService;
-import ua.team3.carsharingservice.service.impl.payments.strategy.PaymentHandlerFactory;
+import ua.team3.carsharingservice.service.impl.payment.strategy.PaymentHandlerFactory;
 import ua.team3.carsharingservice.telegram.service.NotificationService;
 
 @Service
@@ -182,7 +182,6 @@ public class PaymentServiceImpl implements PaymentService {
             rental.setStatus(CANCELLED);
             rentalRepository.save(rental);
         }
-        paymentRepository.save(payment);
     }
 
     private Payment updatePaymentStatus(String sessionId, Payment.Status status) {
